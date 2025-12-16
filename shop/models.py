@@ -88,7 +88,7 @@ class QuestionPaper(models.Model):
         choices=[
             ('midterm', 'Mid-Term Exam'),
             ('endterm', 'End-Term Exam'),
-            ('cat', 'CAT (Continuous Assessment Test)'),
+            ('ct', 'Class Test'),
             ('assignment', 'Assignment'),
             ('final', 'Final Exam'),
             ('mock', 'Mock Exam'),
@@ -348,7 +348,6 @@ class FreeSample(models.Model):
             self.sample_pdf.delete(save=False)
         
         super().delete(*args, **kwargs)
-    # --- END CRITICAL FIX ---
     
     class Meta:
         ordering = ('-created_at',)
