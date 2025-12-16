@@ -18,8 +18,8 @@ ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.s
 # Add additional hosts
 additional_hosts = [
     config('NGROK_TUNNEL', default='').replace('https://', '').replace('http://', '').split('/')[0],
-    '.netlify.app',
-    'insiightprep.netlify.app',
+    '.onrender.com',
+    'insiightprep.onrender.com',
     config('RENDER_EXTERNAL_HOSTNAME', default=''),
 ]
 for host in additional_hosts:
@@ -76,7 +76,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'InsightInnovations.urls'
+ROOT_URLCONF = 'InsiightPrep.urls'
 
 TEMPLATES = [
     {
@@ -95,7 +95,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'InsightInnovations.wsgi.application'
+WSGI_APPLICATION = 'InsiightPrep.wsgi.application'
 
 # ====================================================================
 # DATABASE (No change)
