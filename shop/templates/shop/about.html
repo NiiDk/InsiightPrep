@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0"><i class="fas fa-info-circle me-2"></i> About Insight Innovations</h2>
+                </div>
+                <div class="card-body">
+                    {{ content|safe }}
+                    
+                    <div class="mt-4">
+                        <h5>Contact Information</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-envelope me-2 text-info"></i> Email: darkosammy2@gmail.com</li>
+                            <li><i class="fas fa-phone me-2 text-info"></i> Phone: +233 542 232 515</li>
+                            <li><i class="fas fa-map-marker-alt me-2 text-info"></i> Location: Accra, Ghana</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!-- Simple breadcrumbs navigation -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Home</a></li>
+        {% if class_level %}
+            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' class_level.slug %}">{{ class_level.name }}</a></li>
+        {% endif %}
+        {% if term and class_level %}
+            <li class="breadcrumb-item"><a href="{% url 'shop:subject_list' class_level.slug term.slug %}">{{ term.name }}</a></li>
+        {% endif %}
+        {% if paper %}
+            <li class="breadcrumb-item active" aria-current="page">{{ paper.title|truncatechars:30 }}</li>
+        {% endif %}
+    </ol>
+</nav>

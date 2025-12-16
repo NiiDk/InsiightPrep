@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Classes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' class_level.slug %}">{{ class_level.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:subject_list' class_level.slug term.slug %}">{{ term.name }}</a></li>
+            <li class="breadcrumb-item active">{{ subject.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header custom-green-header text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-book me-2"></i>{{ subject.name }}
+                    </h2>
+                    <p class="mb-0">
+                        <i class="bi bi-mortarboard"></i> {{ class_level.name }} • 
+                        <i class="bi bi-calendar-week"></i> {{ term.name }}
+                    </p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark fs-5 p-2">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> {{ paper_count }} Paper{{ paper_count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body custom-deep-black-body text-light">
+            <p class="lead mb-0">
+                Browse all available question papers for {{ subject.name }} in {{ term.name }}.
+                {% if subject.description %}<br><small class="text-white-50">{{ subject.description }}</small>{% endif %}
+            </p>
+        </div>
+    </div>
+    
+    {% if papers %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search papers..." id="searchPapers">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-md-end gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-funnel"></i> Filter
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" data-filter="all">All Papers</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="paid">Paid Only</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="free">Free Only</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-sort-down"></i> Sort
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" data-sort="newest">Newest First</a></li>
+                                    <li><a class="dropdown-item" href="#" data-sort="oldest">Oldest First</a></li>
+                                    <li><a class="dropdown-item" href="#" data-sort="price-low">Price: Low to High</a></li>
+                                    <li><a class="dropdown-item" href="#" data-sort="price-high">Price: High to Low</a></li>
+                                    <li><a class="dropdown-item" href="#" data-sort="popular">Most Popular</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="papersGrid">
+            {% for paper in papers %}
+            <div class="col" data-price="{{ paper.price }}" data-paid="{{ paper.is_paid|lower }}" data-views="{{ paper.views }}" data-date="{{ paper.created_at|date:'Y-m-d' }}">
+                <div class="card h-100 shadow-sm border-0 paper-card">
+                    <div class="paper-preview position-relative">
+                        {% if paper.preview_image %}
+                        <img src="{% if paper.generate_thumbnail %}{{ paper.generate_thumbnail }}{% else %}{{ paper.get_preview_image_url }}{% endif %}" 
+                            class="card-img-top" 
+                            alt="{{ paper.title }} Preview"
+                            style="height: 180px; object-fit: cover; border-bottom: 1px solid #dee2e6;">
+                        <div class="preview-badge">
+                            <span class="badge bg-dark bg-opacity-75">
+                                <i class="bi bi-filetype-pdf"></i> PDF
+                            </span>
+                        </div>
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                            style="height: 180px; border-bottom: 1px solid #dee2e6;">
+                            <div class="text-center">
+                                <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 3rem;"></i>
+                                <p class="text-muted small mt-2">PDF Document</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="position-absolute top-0 end-0 m-2">
+                            {% if paper.is_paid %}
+                            <span class="badge bg-warning text-dark fs-6 p-2 shadow">
+                                {{ currency_code }} {{ paper.price }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success fs-6 p-2 shadow">
+                                <i class="bi bi-gift"></i> FREE
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate" title="{{ paper.title }}">
+                            {{ paper.title }}
+                        </h5>
+                        
+                        <div class="paper-meta mb-3">
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                <span class="badge bg-secondary">{{ paper.year }}</span>
+                                <span class="badge bg-info">{{ paper.get_exam_type_display }}</span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-eye"></i> {{ paper.views }}
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-download"></i> {{ paper.downloads.count }}
+                                </span>
+                            </div>
+                            
+                            <div class="file-info small text-muted mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>
+                                        <i class="bi bi-file-text"></i> {{ paper.pages }} page{{ paper.pages|pluralize }}
+                                    </span>
+                                    <span>
+                                        <i class="bi bi-hdd"></i> {{ paper.file_size|default:"N/A" }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="cloudinary-badge">
+                                <small class="text-muted">
+                                    <i class="bi bi-cloud-check"></i> Stored on Cloudinary
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            {% if not paper.is_paid %}
+                            <a href="{{ paper.get_pdf_url }}" 
+                                class="btn btn-success btn-sm w-100 mb-2"
+                                download="{{ paper.file_name }}"
+                                onclick="trackDownload('{{ paper.slug }}')">
+                                <i class="bi bi-download"></i> Download Free
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-grid">
+                            <a href="{% url 'shop:paper_detail' class_level.slug term.slug subject.slug paper.slug %}" 
+                                class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-eye me-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div id="noResults" class="alert alert-warning text-center py-5 d-none">
+            <div class="py-4">
+                <i class="bi bi-search fa-3x text-warning mb-3"></i>
+                <h3>No Papers Found</h3>
+                <p class="lead">Try adjusting your search or filter criteria.</p>
+            </div>
+        </div>
+        
+    {% else %}
+        <div class="alert alert-warning text-center py-5">
+            <div class="py-4">
+                <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h3>No Papers Available</h3>
+                <p class="lead">There are currently no question papers available for {{ subject.name }} in {{ term.name }}.</p>
+                <div class="mt-3">
+                    <a href="{% url 'shop:subject_list' class_level.slug term.slug %}" 
+                        class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Subjects
+                    </a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin:shop_questionpaper_add' %}" 
+                        target="_blank" 
+                        class="btn btn-warning ms-2">
+                        <i class="bi bi-plus me-1"></i> Add Paper (Admin)
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="mt-4 text-center">
+        <a href="{% url 'shop:subject_list' class_level.slug term.slug %}" 
+            class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to All Subjects
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Track download for free papers
+function trackDownload(slug) {
+    fetch(`/api/track-download/${slug}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    });
+}
+
+// Search, Filter, and Sort functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchPapers');
+    const papersGrid = document.getElementById('papersGrid');
+    const noResults = document.getElementById('noResults');
+    const paperCards = papersGrid ? Array.from(papersGrid.querySelectorAll('.col')) : [];
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const sortButtons = document.querySelectorAll('[data-sort]');
+    
+    let currentFilter = 'all';
+    let currentSort = 'newest';
+
+    // Function to apply search, filter, and sort
+    function updateGrid() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        let visibleCards = 0;
+        
+        // 1. Filtering and Searching
+        paperCards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            const description = card.querySelector('.card-text') ? 
+                card.querySelector('.card-text').textContent.toLowerCase() : '';
+            const isPaid = card.getAttribute('data-paid');
+
+            const passesFilter = (
+                currentFilter === 'all' ||
+                (currentFilter === 'paid' && isPaid === 'true') ||
+                (currentFilter === 'free' && isPaid === 'false')
+            );
+            
+            const passesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+
+            if (passesFilter && passesSearch) {
+                card.style.display = 'block';
+                visibleCards++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // 2. Sorting (Sorts only the visible items currently in the DOM)
+        const visibleCardsArray = paperCards.filter(card => card.style.display !== 'none');
+
+        visibleCardsArray.sort((a, b) => {
+            switch(currentSort) {
+                case 'newest':
+                    return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                case 'oldest':
+                    return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                case 'price-low':
+                    return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                case 'price-high':
+                    return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                case 'popular':
+                    return parseInt(b.getAttribute('data-views')) - parseInt(a.getAttribute('data-views'));
+                default:
+                    return 0;
+            }
+        });
+
+        // Reorder the grid
+        visibleCardsArray.forEach(card => {
+            papersGrid.appendChild(card);
+        });
+
+        // 3. Show/hide no results message
+        if (noResults) {
+            if (visibleCards === 0) {
+                noResults.classList.remove('d-none');
+                papersGrid.classList.add('d-none');
+            } else {
+                noResults.classList.add('d-none');
+                papersGrid.classList.remove('d-none');
+            }
+        }
+    }
+
+    // --- Event Listeners and Initialization ---
+
+    // Initialize Sort to Newest First
+    if (paperCards.length > 0) {
+        // Apply initial sort (ensuring it's applied correctly on load)
+        paperCards.sort((a, b) => new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date')));
+        paperCards.forEach(card => { papersGrid.appendChild(card); });
+        // Mark the default 'Newest First' as active (assuming you add a default active class)
+        // document.querySelector('[data-sort="newest"]').classList.add('active-sort');
+    }
+
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', updateGrid);
+    }
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentFilter = this.getAttribute('data-filter');
+            
+            // Update filter button text
+            document.querySelector('.dropdown button[data-bs-toggle="dropdown"]').innerHTML = 
+                `<i class="bi bi-funnel"></i> ${this.textContent}`;
+
+            updateGrid();
+        });
+    });
+    
+    // Sort functionality
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentSort = this.getAttribute('data-sort');
+            
+            // Update sort button text (Targeting the second dropdown button)
+            document.querySelectorAll('.dropdown button[data-bs-toggle="dropdown"]')[1].innerHTML = 
+                `<i class="bi bi-sort-down"></i> ${this.textContent}`;
+            
+            updateGrid();
+        });
+    });
+    
+    // Add hover effects
+    paperCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+
+<style>
+/* Custom Styles for Header and Body colors */
+
+/* Green Header - Used on the element with class .custom-green-header */
+.custom-green-header {
+    background-color: #28a745 !important; /* Bootstrap Success Green */
+    color: #ffffff !important; /* White text for contrast */
+    border-bottom: 1px solid #1e7e34; /* Darker green border */
+}
+
+/* Deep Black Body - Used on the element with class .custom-deep-black-body */
+.custom-deep-black-body {
+    background-color: #000000 !important; /* True Black */
+    color: #f8f9fa !important; /* Light text for readability */
+}
+
+
+/* --- Existing styles remain below --- */
+.paper-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.paper-card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: #86b7fe;
+}
+
+.paper-preview {
+    overflow: hidden;
+}
+
+.preview-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.file-info {
+    /* Keeping file info light for contrast against overall page background */
+    background: #f8f9fa; 
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.quick-actions .btn {
+    transition: all 0.3s ease;
+}
+
+.quick-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.cloudinary-badge {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.dropdown-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+#noResults {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .paper-preview img {
+        height: 150px !important;
+    }
+    
+    .position-absolute.top-0.end-0.m-2 {
+        margin: 5px !important;
+    }
+    
+    .badge.fs-6 {
+        font-size: 0.8rem !important;
+        padding: 4px 8px !important;
+    }
+}
+</style>
+{% endblock %}

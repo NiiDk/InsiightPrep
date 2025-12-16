@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <!-- Login Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-sign-in-alt me-2"></i>Welcome Back
+                    </h2>
+                    <p class="text-center mb-0 small opacity-75">
+                        Sign in to access your account and purchases
+                    </p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <!-- Login Form -->
+                    <form method="post" id="loginForm" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Please enter a correct username and password. Note that both fields are case-sensitive.
+                        </div>
+                        {% endif %}
+                        
+                        {% if next %}
+                            {% if user.is_authenticated %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Your account doesn't have access to this page. To proceed, please login with an account that has access.
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Please login to access this page.
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <!-- Username/Email Field -->
+                        <div class="mb-4">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-2"></i>Username or Email <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   id="username" 
+                                   name="username"
+                                   value="{{ form.username.value|default:'' }}"
+                                   required
+                                   placeholder="Enter your username or email"
+                                   autofocus>
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password Field -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="password" class="form-label mb-0">
+                                    <i class="fas fa-lock me-2"></i>Password <span class="text-danger">*</span>
+                                </label>
+                                <a href="#forgotPasswordModal" class="small text-decoration-none" data-bs-toggle="modal">
+                                    Forgot Password?
+                                </a>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                       id="password" 
+                                       name="password"
+                                       required
+                                       placeholder="Enter your password">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Remember Me -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="remember" 
+                                       name="remember"
+                                       checked>
+                                <label class="form-check-label" for="remember">
+                                    Remember me on this device
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                            <input type="hidden" name="next" value="{{ next }}">
+                        </div>
+                        
+                        <!-- Social Login (Optional) -->
+                        <div class="text-center mb-4">
+                            <p class="text-muted small mb-3">Or sign in with</p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <button type="button" class="btn btn-outline-dark btn-sm">
+                                    <i class="fab fa-google me-2"></i>Google
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm">
+                                    <i class="fab fa-facebook me-2"></i>Facebook
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Registration Link -->
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="mb-2">Don't have an account?</p>
+                        <a href="{% url 'shop:register' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Guest Notice -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Guest Access
+                    </h5>
+                    <p class="small text-muted mb-3">
+                        You can browse papers and make purchases without creating an account. However, registering allows you to:
+                    </p>
+                    <ul class="small text-muted">
+                        <li>Access your purchase history anytime</li>
+                        <li>Re-download purchased papers</li>
+                        <li>Get notifications about new content</li>
+                        <li>Save your favorite papers</li>
+                    </ul>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'shop:class_list' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-graduation-cap me-2"></i>Continue as Guest
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>Reset Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    Enter your email address and we'll send you a link to reset your password.
+                </p>
+                <div class="mb-3">
+                    <label for="resetEmail" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="resetEmail" placeholder="name@example.com">
+                </div>
+                <div class="alert alert-info small">
+                    <i class="fas fa-info-circle me-2"></i>
+                    If you don't remember which email you used, please contact support.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendResetLink()">
+                    <i class="fas fa-paper-plane me-2"></i>Send Reset Link
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus username field
+    document.getElementById('username').focus();
+    
+    // Check for URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('registered')) {
+        showSuccessToast('Account created successfully! Please login.');
+    }
+    
+    if (urlParams.has('logout')) {
+        showInfoToast('You have been successfully logged out.');
+    }
+});
+
+// Toggle password visibility
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const button = field.nextElementSibling.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        button.className = 'fas fa-eye-slash';
+    } else {
+        field.type = 'password';
+        button.className = 'fas fa-eye';
+    }
+}
+
+// Send password reset link
+function sendResetLink() {
+    const email = document.getElementById('resetEmail').value;
+    const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+    
+    if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
+    // Show loading state
+    const sendBtn = document.querySelector('#forgotPasswordModal .btn-primary');
+    const originalText = sendBtn.innerHTML;
+    sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    sendBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Reset button
+        sendBtn.innerHTML = originalText;
+        sendBtn.disabled = false;
+        
+        // Close modal
+        modal.hide();
+        
+        // Show success message
+        showSuccessToast(`Reset link sent to ${email}. Please check your inbox.`);
+        
+        // Clear input
+        document.getElementById('resetEmail').value = '';
+    }, 2000);
+}
+
+// Toast notifications
+function showSuccessToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 p-3';
+    toast.style.zIndex = '11';
+    toast.innerHTML = `
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        document.body.removeChild(toast);
+    }, 5000);
+}
+
+function showInfoToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 p-3';
+    toast.style.zIndex = '11';
+    toast.innerHTML = `
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-info text-white">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong class="me-auto">Info</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        document.body.removeChild(toast);
+    }, 5000);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+Enter to submit form
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('loginForm').submit();
+    }
+    
+    // Escape to clear form
+    if (e.key === 'Escape') {
+        document.getElementById('loginForm').reset();
+    }
+});
+</script>
+
+<style>
+.form-label {
+    font-weight: 500;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group .btn-outline-secondary {
+    border-color: #ced4da;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-outline-dark:hover {
+    background-color: #343a40;
+    color: white;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 12px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 12px 12px;
+}
+
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+.toast {
+    min-width: 300px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 576px) {
+    .toast {
+        min-width: 250px;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

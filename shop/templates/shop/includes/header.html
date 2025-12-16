@@ -1,0 +1,328 @@
+<!-- templates/shop/includes/header.html -->
+<header>
+    <!-- Top Bar -->
+    <div class="top-bar bg-dark text-white py-2 d-none d-lg-block">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-phone-alt me-2 small"></i>
+                        <a href="tel:+233542232515" class="text-white small text-decoration-none me-3">
+                            +233 542 232 515
+                        </a>
+                        <i class="fas fa-envelope me-2 small"></i>
+                        <a href="mailto:darkosammy2@gmail.com" class="text-white small text-decoration-none">
+                            darkosammy2@gmail.com
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end align-items-center">
+                        {% if user.is_authenticated %}
+                        <span class="me-3 small">
+                            Welcome, {{ user.username|truncatechars:15 }}
+                        </span>
+                        <a href="{% url 'shop:profile' %}" class="text-white small text-decoration-none me-3">
+                            <i class="fas fa-user me-1"></i>Profile
+                        </a>
+                        <a href="{% url 'shop:logout' %}" class="text-white small text-decoration-none">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                        {% else %}
+                        <a href="{% url 'shop:login' %}" class="text-white small text-decoration-none me-3">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a href="{% url 'shop:register' %}" class="text-white small text-decoration-none">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand fw-bold" href="{% url 'shop:class_list' %}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Insight Innovations
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" 
+                           href="{% url 'shop:class_list' %}">
+                            <i class="fas fa-home d-lg-none d-xl-inline me-1"></i>
+                            <span class="d-none d-lg-inline">Home</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Papers Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-file-alt d-lg-none d-xl-inline me-1"></i>
+                            <span class="d-none d-lg-inline">Papers</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'shop:all_papers' %}">
+                                <i class="fas fa-file-alt me-2"></i>All Papers
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Browse by Year</h6></li>
+                            {% for year in recent_years %}
+                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_year' year %}">
+                                <i class="fas fa-calendar me-2"></i>{{ year }} Papers
+                            </a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Browse by Type</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' 'endterm' %}">
+                                <i class="fas fa-file-contract me-2"></i>End-Term Exams
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' 'midterm' %}">
+                                <i class="fas fa-file-medical me-2"></i>Mid-Term Exams
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' 'cat' %}">
+                                <i class="fas fa-file-check me-2"></i>CATs
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Classes Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-graduation-cap d-lg-none d-xl-inline me-1"></i>
+                            <span class="d-none d-lg-inline">Classes</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for class_obj in all_classes %}
+                            <li><a class="dropdown-item" href="{% url 'shop:term_list' class_obj.slug %}">
+                                <i class="fas fa-book me-2"></i>{{ class_obj.name }}
+                            </a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:class_list' %}">
+                                <i class="fas fa-list me-2"></i>View All Classes
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Subjects Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-book d-lg-none d-xl-inline me-1"></i>
+                            <span class="d-none d-lg-inline">Subjects</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for subject in popular_subjects %}
+                            <li><a class="dropdown-item" href="{% url 'shop:search_papers' %}?q={{ subject.name }}">
+                                <i class="fas fa-bookmark me-2"></i>{{ subject.name }}
+                            </a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:search_papers' %}">
+                                <i class="fas fa-search me-2"></i>Browse All Subjects
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Information -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-info-circle d-lg-none d-xl-inline me-1"></i>
+                            <span class="d-none d-lg-inline">Information</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'shop:about' %}">
+                                <i class="fas fa-info-circle me-2"></i>About Us
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:faq' %}">
+                                <i class="fas fa-question-circle me-2"></i>FAQs
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:contact_us' %}">
+                                <i class="fas fa-envelope me-2"></i>Contact Us
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:privacy_policy' %}">
+                                <i class="fas fa-shield-alt me-2"></i>Privacy Policy
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:terms_of_service' %}">
+                                <i class="fas fa-file-contract me-2"></i>Terms of Service
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex ms-2" action="{% url 'shop:search_papers' %}" method="GET">
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               name="q" 
+                               placeholder="Search papers..." 
+                               aria-label="Search"
+                               value="{{ request.GET.q|default:'' }}">
+                        <button class="btn btn-light" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- User Menu -->
+                {% if user.is_authenticated %}
+                <ul class="navbar-nav ms-3">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="avatar-circle bg-white text-primary d-flex align-items-center justify-content-center me-2" 
+                                 style="width: 32px; height: 32px; border-radius: 50%; font-weight: bold;">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <span class="d-none d-lg-inline">{{ user.username|truncatechars:15 }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'shop:profile' %}">
+                                <i class="fas fa-user me-2"></i>My Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:purchase_history' %}">
+                                <i class="fas fa-history me-2"></i>Purchase History
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'shop:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Breadcrumb -->
+    {% if breadcrumbs %}
+    <nav aria-label="breadcrumb" class="bg-light py-2 border-bottom">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                {% for crumb in breadcrumbs %}
+                    {% if forloop.last %}
+                    <li class="breadcrumb-item active">{{ crumb.name }}</li>
+                    {% else %}
+                    <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        </div>
+    </nav>
+    {% endif %}
+</header>
+
+<style>
+.top-bar {
+    font-size: 0.875rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.top-bar a:hover {
+    color: #0dcaf0 !important;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 6px;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 2px;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+}
+
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .btn-light {
+    border: 1px solid #ced4da;
+    border-left: none;
+}
+
+.breadcrumb {
+    padding: 0;
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.avatar-circle {
+    background: linear-gradient(135deg, #fff, #e9ecef);
+    color: #1e3c72;
+    font-weight: bold;
+}
+
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 0;
+    }
+    
+    .dropdown-menu {
+        background-color: rgba(255,255,255,0.95);
+    }
+}
+</style>

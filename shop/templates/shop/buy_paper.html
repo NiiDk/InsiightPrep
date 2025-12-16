@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Buy {{ paper.title }} - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Purchase Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Secure Purchase</h2>
+                            <p class="mb-0 small opacity-75">Complete your purchase to access the paper</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <!-- Paper Info -->
+                    <div class="paper-preview mb-5">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                {% if paper.preview_image %}
+                                <img src="{% if paper.generate_thumbnail %}{{ paper.generate_thumbnail }}{% else %}{{ paper.get_preview_image_url }}{% endif %}" 
+                                     alt="{{ paper.title }}"
+                                     class="img-fluid rounded shadow">
+                                {% else %}
+                                <div class="bg-light text-center rounded p-4">
+                                    <i class="fas fa-file-pdf fa-4x text-danger"></i>
+                                    <p class="mt-2 mb-0 small text-muted">PDF Document</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <h3 class="mb-2">{{ paper.title }}</h3>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge bg-primary">{{ paper.class_level.name }}</span>
+                                    <span class="badge bg-info">{{ paper.term.name }}</span>
+                                    <span class="badge bg-secondary">{{ paper.subject.name }}</span>
+                                    <span class="badge bg-light text-dark">{{ paper.year }}</span>
+                                </div>
+                                <div class="price-display mb-3">
+                                    <h2 class="text-success fw-bold mb-0">
+                                        {{ currency_code|default:"GHS" }} {{ paper.price }}
+                                    </h2>
+                                    <small class="text-muted">One-time purchase • Lifetime access</small>
+                                </div>
+                                <div class="paper-details">
+                                    <div class="row small text-muted">
+                                        <div class="col-6">
+                                            <i class="fas fa-file-alt me-1"></i> {{ paper.pages }} pages
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fas fa-hdd me-1"></i> {{ paper.file_size|default:"N/A" }}
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fas fa-eye me-1"></i> {{ paper.views }} views
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fas fa-download me-1"></i> {{ paper.downloads.count }} downloads
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Purchase Form -->
+                    <form action="{% url 'shop:buy_paper' paper.slug %}" method="POST" id="purchaseForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Security Alert -->
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-shield-alt fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading mb-2">Secure Purchase Process</h5>
+                                    <p class="mb-0">
+                                        After successful payment, the password will be sent instantly via SMS to your mobile phone.
+                                        The PDF file is securely stored and delivered.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Please correct the errors below.
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Customer Information -->
+                        <div class="mb-4">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-user-circle me-2"></i>Customer Information
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                           id="id_email"
+                                           value="{{ form.email.value|default:'' }}"
+                                           placeholder="you@example.com"
+                                           required>
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Receipt and updates will be sent here</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_phone_number" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>Mobile Money Number <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+233</span>
+                                        <input type="tel"
+                                               name="phone_number"
+                                               class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                                               id="id_phone_number"
+                                               value="{{ form.phone_number.value|default:'' }}"
+                                               placeholder="54 223 2515"
+                                               pattern="[0-9]{9,10}"
+                                               required>
+                                        {% if form.phone_number.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form.phone_number.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-text">Password will be sent via SMS to this number</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Information -->
+                        <div class="mb-4">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-credit-card me-2"></i>Payment Details
+                            </h4>
+                            
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h5 class="mb-2">Total Amount</h5>
+                                            <div class="d-flex align-items-center">
+                                                <h2 class="text-success fw-bold mb-0 me-3">{{ currency_code|default:"GHS" }} {{ paper.price }}</h2>
+                                                <span class="badge bg-success">One-time payment</span>
+                                            </div>
+                                            <p class="text-muted small mb-0 mt-2">
+                                                <i class="fas fa-check-circle text-success me-1"></i>
+                                                No hidden fees • No subscription
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <div class="payment-methods">
+                                                <small class="text-muted d-block mb-2">Accepted Payment Methods:</small>
+                                                <div class="d-flex justify-content-md-end gap-2">
+                                                    <i class="fab fa-cc-mastercard fa-2x text-muted"></i>
+                                                    <i class="fab fa-cc-visa fa-2x text-muted"></i>
+                                                    <i class="fas fa-mobile-alt fa-2x text-muted"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="terms" 
+                                       name="terms"
+                                       required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the 
+                                    <a href="{% url 'shop:terms_of_service' %}" target="_blank" class="text-decoration-none">Terms of Service</a> 
+                                    and 
+                                    <a href="{% url 'shop:privacy_policy' %}" target="_blank" class="text-decoration-none">Privacy Policy</a>
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="receipt" 
+                                       name="receipt"
+                                       checked>
+                                <label class="form-check-label" for="receipt">
+                                    Send me a receipt and updates about my purchase
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg py-3" id="submitBtn">
+                                <i class="fas fa-lock me-2"></i>Proceed to Pay {{ currency_code|default:"GHS" }} {{ paper.price }}
+                            </button>
+                            
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}"
+                                   class="btn btn-outline-secondary flex-fill">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Paper Details
+                                </a>
+                                <a href="{% url 'shop:class_list' %}" class="btn btn-outline-secondary flex-fill">
+                                    <i class="fas fa-home me-2"></i>Cancel & Return Home
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Footer Information -->
+                <div class="card-footer bg-light">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-2">
+                                <i class="fas fa-info-circle text-primary me-2"></i>Purchase Benefits
+                            </h6>
+                            <ul class="small mb-0">
+                                <li>Lifetime access to the paper</li>
+                                <li>Unlimited downloads</li>
+                                <li>Password-protected for security</li>
+                                <li>Instant SMS delivery</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h6 class="mb-2">
+                                <i class="fas fa-shield-alt text-success me-2"></i>Secure Payment
+                            </h6>
+                            <ul class="small mb-0">
+                                <li>Powered by Paystack</li>
+                                <li>SSL encrypted</li>
+                                <li>PCI DSS compliant</li>
+                                <li>Mobile Money enabled</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-2">
+                                <i class="fas fa-question-circle text-info me-2"></i>Need Help?
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Having trouble with your purchase? Contact our support team for assistance.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'shop:contact_us' %}" class="btn btn-outline-info">
+                                <i class="fas fa-headset me-2"></i>Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('purchaseForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Phone number formatting
+    const phoneInput = document.getElementById('id_phone_number');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                value = value.match(/.{1,3}/g).join(' ');
+            }
+            this.value = value;
+        });
+    }
+    
+    // Form validation
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+                
+                // Special validation for phone
+                if (field.id === 'id_phone_number') {
+                    const phoneValue = field.value.replace(/\D/g, '');
+                    if (phoneValue.length < 9 || phoneValue.length > 10) {
+                        field.classList.add('is-invalid');
+                        field.nextElementSibling.innerHTML = 'Phone number must be 9-10 digits';
+                        isValid = false;
+                    }
+                }
+                
+                // Special validation for email
+                if (field.id === 'id_email') {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(field.value)) {
+                        field.classList.add('is-invalid');
+                        field.nextElementSibling.innerHTML = 'Please enter a valid email address';
+                        isValid = false;
+                    }
+                }
+            });
+            
+            // Check terms agreement
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                termsCheckbox.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                termsCheckbox.classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll to first error
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            } else {
+                // Disable button and show loading
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                    submitBtn.disabled = true;
+                }
+            }
+        });
+    }
+    
+    // Auto-capitalize email local part
+    const emailInput = document.getElementById('id_email');
+    if (emailInput) {
+        emailInput.addEventListener('blur', function() {
+            const parts = this.value.split('@');
+            if (parts.length === 2) {
+                parts[0] = parts[0].toLowerCase();
+                this.value = parts.join('@');
+            }
+        });
+    }
+    
+    // Track form interactions
+    let formStarted = false;
+    form.addEventListener('focusin', function() {
+        if (!formStarted) {
+            formStarted = true;
+            // Could send analytics event here
+        }
+    });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+Enter to submit form
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('purchaseForm').submit();
+    }
+    
+    // Escape to clear form
+    if (e.key === 'Escape') {
+        if (confirm('Clear all form fields?')) {
+            document.getElementById('purchaseForm').reset();
+        }
+    }
+});
+</script>
+
+<style>
+.paper-preview img {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.price-display {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.card-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.input-group .form-control {
+    border-left: none;
+}
+
+.btn-lg {
+    padding: 15px 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-lg:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.badge {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .btn-lg {
+        padding: 12px 24px;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

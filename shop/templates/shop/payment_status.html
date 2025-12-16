@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Status - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-info text-white py-4">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-receipt me-2"></i>Payment Status
+                    </h2>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    {% if payment %}
+                        <!-- Payment Status Card -->
+                        <div class="card mb-4 border-{% if payment.verified %}success{% else %}warning{% endif %}">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                                        {% if payment.verified %}
+                                            <i class="fas fa-check-circle fa-3x text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-clock fa-3x text-warning"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-10">
+                                        <h4 class="card-title mb-2">
+                                            {% if payment.verified %}
+                                                Payment Verified
+                                            {% else %}
+                                                Payment Pending
+                                            {% endif %}
+                                        </h4>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Reference:</strong></p>
+                                                <code class="bg-light p-2 rounded">{{ payment.ref }}</code>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Amount:</strong></p>
+                                                <h5 class="text-success">{{ currency_code }} {{ payment.amount_paid|default:payment.question_paper.price }}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Paper Details -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Paper Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ payment.question_paper.title }}</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>Class:</strong></p>
+                                        <p>{{ payment.question_paper.class_level.name }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>Subject:</strong></p>
+                                        <p>{{ payment.question_paper.subject.name }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1"><strong>Term:</strong></p>
+                                        <p>{{ payment.question_paper.term.name }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Details -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Payment Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Date:</strong> {{ payment.date_created|date:"F d, Y H:i" }}</p>
+                                        <p><strong>Email:</strong> {{ payment.email }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Phone:</strong> {{ payment.phone_number }}</p>
+                                        <p><strong>Status:</strong> 
+                                            <span class="badge bg-{% if payment.verified %}success{% else %}warning{% endif %}">
+                                                {% if payment.verified %}Verified{% else %}Pending{% endif %}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4">
+                            {% if payment.verified %}
+                                <a href="{% url 'shop:download_file' payment.question_paper.slug %}?ref={{ payment.ref }}&email={{ payment.email|urlencode }}" 
+                                   class="btn btn-success btn-lg me-3">
+                                    <i class="fas fa-download me-2"></i>Download Paper
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'shop:paper_detail' payment.question_paper.class_level.slug payment.question_paper.term.slug payment.question_paper.subject.slug payment.question_paper.slug %}" 
+                               class="btn btn-outline-info btn-lg me-3">
+                                <i class="fas fa-eye me-2"></i>View Paper Details
+                            </a>
+                            
+                            <a href="{% url 'shop:class_list' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-home me-2"></i>Return Home
+                            </a>
+                        </div>
+                        
+                    {% else %}
+                        <!-- No Payment Found -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-4x text-warning mb-4"></i>
+                            <h3>Payment Not Found</h3>
+                            <p class="lead">The payment reference you're looking for doesn't exist.</p>
+                            <div class="mt-4">
+                                <a href="{% url 'shop:class_list' %}" class="btn btn-primary btn-lg me-3">
+                                    <i class="fas fa-home me-2"></i>Go Home
+                                </a>
+                                <a href="{% url 'shop:all_papers' %}" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-file-alt me-2"></i>Browse Papers
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="mb-3"><i class="fas fa-question-circle text-info me-2"></i>Need Help?</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Payment Issues?</strong></p>
+                            <p class="small text-muted">If your payment shows as pending for more than 15 minutes, please contact us.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>No SMS Received?</strong></p>
+                            <p class="small text-muted">If you haven't received the password SMS, check your spam folder or contact support.</p>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'shop:contact_us' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-headset me-2"></i>Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search Header -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-gradient-info text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Search Results
+                    </h2>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark fs-6">
+                        <i class="fas fa-file-alt me-1"></i> {{ results_count }} Result{{ results_count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Search Form -->
+            <form method="get" action="{% url 'shop:search_papers' %}" class="mb-0">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="q" 
+                                   value="{{ query }}"
+                                   placeholder="Search question papers by title, subject, or description..."
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="class_level">
+                            <option value="">All Classes</option>
+                            {% for class_obj in all_classes %}
+                            <option value="{{ class_obj.id }}" {% if selected_class == class_obj.id %}selected{% endif %}>
+                                {{ class_obj.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if query %}
+        {% if papers %}
+            <!-- Filters -->
+            <div class="row mb-4">
+                <div class="col-lg-3">
+                    <!-- Filter Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Results</h6>
+                        </div>
+                        <div class="card-body">
+                            <!-- Class Filter -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted mb-2">Class</label>
+                                <select class="form-select form-select-sm" id="classFilter">
+                                    <option value="">All Classes</option>
+                                    {% for class_obj in all_classes %}
+                                    <option value="{{ class_obj.slug }}">{{ class_obj.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Subject Filter -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted mb-2">Subject</label>
+                                <select class="form-select form-select-sm" id="subjectFilter">
+                                    <option value="">All Subjects</option>
+                                    {% for subject in all_subjects %}
+                                    <option value="{{ subject.slug }}">{{ subject.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Price Filter -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted mb-2">Price</label>
+                                <select class="form-select form-select-sm" id="priceFilter">
+                                    <option value="all">All Prices</option>
+                                    <option value="free">Free Only</option>
+                                    <option value="paid">Paid Only</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Year Filter -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted mb-2">Year</label>
+                                <select class="form-select form-select-sm" id="yearFilter">
+                                    <option value="">All Years</option>
+                                    {% for year in years %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <button class="btn btn-sm btn-outline-primary w-100" onclick="applyFilters()">
+                                <i class="fas fa-filter me-1"></i> Apply Filters
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary w-100 mt-2" onclick="clearFilters()">
+                                <i class="fas fa-times me-1"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Tips -->
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-3">
+                                <i class="fas fa-lightbulb me-2"></i>Search Tips
+                            </h6>
+                            <ul class="small text-muted mb-0">
+                                <li>Use quotes for exact matches</li>
+                                <li>Try different keywords</li>
+                                <li>Filter by class or subject</li>
+                                <li>Browse by category instead</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Column -->
+                <div class="col-lg-9">
+                    <!-- Results Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-0">Found {{ results_count }} result{{ results_count|pluralize }} for "{{ query }}"</h4>
+                            <p class="text-muted small mb-0">Showing {{ papers|length }} papers</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-sort me-1"></i> Sort by
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-sort="relevance">Relevance</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="newest">Newest First</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="oldest">Oldest First</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="price-low">Price: Low to High</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="price-high">Price: High to Low</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="popular">Most Popular</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Grid -->
+                    <div class="row row-cols-1 row-cols-md-2 g-4" id="resultsGrid">
+                        {% for paper in papers %}
+                        <div class="col paper-card" 
+                             data-class="{{ paper.class_level.slug }}"
+                             data-subject="{{ paper.subject.slug }}"
+                             data-price="{{ paper.is_paid|yesno:'paid,free' }}"
+                             data-year="{{ paper.year }}"
+                             data-views="{{ paper.views }}"
+                             data-date="{{ paper.created_at|date:'Y-m-d' }}">
+                            <div class="card h-100 shadow-sm border-0">
+                                <!-- Paper Preview -->
+                                <div class="position-relative">
+                                    {% if paper.preview_image %}
+                                    <img src="{{ paper.generate_thumbnail|default:paper.get_preview_image_url }}" 
+                                         class="card-img-top" 
+                                         alt="{{ paper.title }}"
+                                         style="height: 180px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                         style="height: 180px;">
+                                        <div class="text-center">
+                                            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                            <p class="text-muted small mt-2">PDF Document</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Price Badge -->
+                                    <div class="position-absolute top-0 end-0 m-2">
+                                        {% if paper.is_paid %}
+                                        <span class="badge bg-warning text-dark">
+                                            {{ currency_code }} {{ paper.price }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-success">FREE</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                                           class="text-decoration-none text-dark">
+                                            {{ paper.title }}
+                                        </a>
+                                    </h5>
+                                    
+                                    <!-- Paper Meta -->
+                                    <div class="mb-3">
+                                        <div class="d-flex flex-wrap gap-1 mb-2">
+                                            <span class="badge bg-secondary">{{ paper.class_level.name }}</span>
+                                            <span class="badge bg-info">{{ paper.term.name }}</span>
+                                            <span class="badge bg-light text-dark">{{ paper.subject.name }}</span>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2 small text-muted">
+                                            <span><i class="fas fa-calendar"></i> {{ paper.year }}</span>
+                                            <span><i class="fas fa-eye"></i> {{ paper.views }} views</span>
+                                            <span><i class="fas fa-file-alt"></i> {{ paper.pages }} pages</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Description Excerpt -->
+                                    {% if paper.description %}
+                                    <p class="card-text small text-muted mb-3">
+                                        {{ paper.description|truncatewords:20 }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <!-- Highlight Search Terms -->
+                                    {% if query %}
+                                    <div class="search-highlight small bg-light p-2 rounded mb-3">
+                                        <small class="text-muted">Matches found in:</small>
+                                        {% if query|lower in paper.title|lower %}
+                                        <span class="badge bg-success">Title</span>
+                                        {% endif %}
+                                        {% if query|lower in paper.subject.name|lower %}
+                                        <span class="badge bg-success">Subject</span>
+                                        {% endif %}
+                                        {% if paper.description and query|lower in paper.description|lower %}
+                                        <span class="badge bg-success">Description</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            Added {{ paper.created_at|date:"M d, Y" }}
+                                        </small>
+                                        <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                                           class="btn btn-sm btn-outline-info">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- No Results Message -->
+                    <div id="noResults" class="text-center py-5 d-none">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>No Results Found</h4>
+                        <p class="text-muted">Try adjusting your filters or search terms.</p>
+                        <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times me-2"></i>Clear All Filters
+                        </button>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+            
+        {% else %}
+            <!-- No Results Found -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-search fa-4x text-muted"></i>
+                </div>
+                <h3 class="mb-3">No Results Found</h3>
+                <p class="lead text-muted mb-4">
+                    We couldn't find any papers matching "{{ query }}".
+                </p>
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="mb-3">Suggestions:</h5>
+                                <ul class="text-start">
+                                    <li class="mb-2">Check your spelling or try different keywords</li>
+                                    <li class="mb-2">Try more general search terms</li>
+                                    <li class="mb-2">Browse by <a href="{% url 'shop:class_list' %}">class</a> or <a href="{% url 'shop:all_papers' %}">all papers</a></li>
+                                    <li>Contact us if you're looking for something specific</li>
+                                </ul>
+                                <div class="mt-4">
+                                    <a href="{% url 'shop:class_list' %}" class="btn btn-primary me-2">
+                                        <i class="fas fa-graduation-cap me-2"></i>Browse by Class
+                                    </a>
+                                    <a href="{% url 'shop:all_papers' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-file-alt me-2"></i>Browse All Papers
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Empty Search -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-search fa-4x text-primary"></i>
+            </div>
+            <h3 class="mb-3">Search Question Papers</h3>
+            <p class="lead text-muted mb-4">
+                Enter keywords to search through our collection of educational papers.
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="mb-3">What can you search for?</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-book text-primary me-3 mt-1"></i>
+                                        <div>
+                                            <h6>By Subject</h6>
+                                            <p class="small text-muted mb-0">Mathematics, English, Science, etc.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-graduation-cap text-success me-3 mt-1"></i>
+                                        <div>
+                                            <h6>By Class</h6>
+                                            <p class="small text-muted mb-0">JHS 1, Basic 7, Form 3, etc.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-file-alt text-info me-3 mt-1"></i>
+                                        <div>
+                                            <h6>By Paper Title</h6>
+                                            <p class="small text-muted mb-0">"Mid-Term Exam", "CAT 2", "2024 Paper"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-calendar text-warning me-3 mt-1"></i>
+                                        <div>
+                                            <h6>By Year</h6>
+                                            <p class="small text-muted mb-0">2024, 2023, 2022, etc.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filter values from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('class_level')) {
+        document.getElementById('classFilter').value = urlParams.get('class_level');
+    }
+    
+    // Sort functionality
+    document.querySelectorAll('[data-sort]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortType = this.getAttribute('data-sort');
+            const paperCards = document.querySelectorAll('.paper-card');
+            const cardsArray = Array.from(paperCards);
+            
+            cardsArray.sort((a, b) => {
+                switch(sortType) {
+                    case 'newest':
+                        return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                    case 'oldest':
+                        return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                    case 'price-low':
+                        const priceA = a.getAttribute('data-price') === 'paid' ? 1 : 0;
+                        const priceB = b.getAttribute('data-price') === 'paid' ? 1 : 0;
+                        return priceA - priceB;
+                    case 'price-high':
+                        const priceA2 = a.getAttribute('data-price') === 'paid' ? 1 : 0;
+                        const priceB2 = b.getAttribute('data-price') === 'paid' ? 1 : 0;
+                        return priceB2 - priceA2;
+                    case 'popular':
+                        return parseInt(b.getAttribute('data-views')) - parseInt(a.getAttribute('data-views'));
+                    default:
+                        return 0; // relevance (default order)
+                }
+            });
+            
+            // Reorder grid
+            const grid = document.getElementById('resultsGrid');
+            cardsArray.forEach(card => {
+                grid.appendChild(card);
+            });
+            
+            // Update sort button text
+            document.querySelector('.dropdown-toggle').innerHTML = 
+                `<i class="fas fa-sort me-1"></i> ${this.textContent}`;
+        });
+    });
+});
+
+function applyFilters() {
+    const classFilter = document.getElementById('classFilter').value;
+    const subjectFilter = document.getElementById('subjectFilter').value;
+    const priceFilter = document.getElementById('priceFilter').value;
+    const yearFilter = document.getElementById('yearFilter').value;
+    
+    let visibleCount = 0;
+    const paperCards = document.querySelectorAll('.paper-card');
+    const noResults = document.getElementById('noResults');
+    
+    paperCards.forEach(card => {
+        const cardClass = card.getAttribute('data-class');
+        const cardSubject = card.getAttribute('data-subject');
+        const cardPrice = card.getAttribute('data-price');
+        const cardYear = card.getAttribute('data-year');
+        
+        let showCard = true;
+        
+        // Apply filters
+        if (classFilter && cardClass !== classFilter) showCard = false;
+        if (subjectFilter && cardSubject !== subjectFilter) showCard = false;
+        if (priceFilter !== 'all') {
+            if (priceFilter === 'free' && cardPrice !== 'free') showCard = false;
+            if (priceFilter === 'paid' && cardPrice !== 'paid') showCard = false;
+        }
+        if (yearFilter && cardYear !== yearFilter) showCard = false;
+        
+        if (showCard) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Show/hide no results message
+    if (visibleCount === 0) {
+        noResults.classList.remove('d-none');
+    } else {
+        noResults.classList.add('d-none');
+    }
+}
+
+function clearFilters() {
+    document.getElementById('classFilter').value = '';
+    document.getElementById('subjectFilter').value = '';
+    document.getElementById('priceFilter').value = 'all';
+    document.getElementById('yearFilter').value = '';
+    applyFilters();
+}
+
+// Initialize filters on page load
+if (document.querySelector('.paper-card')) {
+    applyFilters();
+}
+</script>
+
+<style>
+.search-highlight .badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+}
+
+.card-img-top {
+    border-radius: 8px 8px 0 0;
+}
+
+.paper-card .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.paper-card .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.badge.bg-light {
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.dropdown-toggle::after {
+    margin-left: 0.5em;
+}
+
+.pagination .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px !important;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

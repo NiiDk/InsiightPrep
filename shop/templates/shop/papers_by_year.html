@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ year }} Papers - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>{{ year }} Question Papers
+                    </h2>
+                    <p class="mb-0 small opacity-75">Browse all papers from {{ year }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark fs-6">
+                        <i class="fas fa-file-alt me-1"></i> {{ papers.count }} Paper{{ papers.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Year Navigation -->
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-filter text-primary me-3 fa-lg"></i>
+                        <div>
+                            <h6 class="mb-1">Filter Papers</h6>
+                            <select class="form-select form-select-sm" id="yearSelect" onchange="changeYear()" style="width: auto;">
+                                <option value="">Select Year</option>
+                                {% for y in available_years %}
+                                <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-md-end gap-2">
+                        <a href="{% url 'shop:all_papers' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-alt me-1"></i> All Papers
+                        </a>
+                        <a href="{% url 'shop:class_list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-graduation-cap me-1"></i> Browse by Class
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-primary mb-1">{{ class_count }}</h3>
+                    <p class="text-muted small mb-0">Classes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-success mb-1">{{ subject_count }}</h3>
+                    <p class="text-muted small mb-0">Subjects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-info mb-1">{{ free_count }}</h3>
+                    <p class="text-muted small mb-0">Free Papers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-warning mb-1">{{ paid_count }}</h3>
+                    <p class="text-muted small mb-0">Paid Papers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">Class</label>
+                    <select class="form-select form-select-sm" id="classFilter">
+                        <option value="">All Classes</option>
+                        {% for class_obj in classes %}
+                        <option value="{{ class_obj.slug }}">{{ class_obj.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">Subject</label>
+                    <select class="form-select form-select-sm" id="subjectFilter">
+                        <option value="">All Subjects</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.slug }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">Exam Type</label>
+                    <select class="form-select form-select-sm" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="endterm">End-Term</option>
+                        <option value="midterm">Mid-Term</option>
+                        <option value="cat">CAT</option>
+                        <option value="assignment">Assignment</option>
+                        <option value="final">Final Exam</option>
+                        <option value="mock">Mock Exam</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">Price</label>
+                    <select class="form-select form-select-sm" id="priceFilter">
+                        <option value="all">All Prices</option>
+                        <option value="free">Free Only</option>
+                        <option value="paid">Paid Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="applyFilters()">
+                            <i class="fas fa-filter me-1"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times me-1"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if papers %}
+        <!-- Papers Grid -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="papersGrid">
+            {% for paper in papers %}
+            <div class="col paper-card" 
+                 data-class="{{ paper.class_level.slug }}"
+                 data-subject="{{ paper.subject.slug }}"
+                 data-type="{{ paper.exam_type }}"
+                 data-price="{{ paper.is_paid|yesno:'paid,free' }}">
+                <div class="card h-100 shadow-sm border-0">
+                    <!-- Paper Preview -->
+                    <div class="position-relative">
+                        {% if paper.preview_image %}
+                        <img src="{{ paper.generate_thumbnail|default:paper.get_preview_image_url }}" 
+                             class="card-img-top" 
+                             alt="{{ paper.title }}"
+                             style="height: 180px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 180px;">
+                            <div class="text-center">
+                                <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                <p class="text-muted small mt-2">PDF Document</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Year Badge -->
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-dark">{{ paper.year }}</span>
+                        </div>
+                        
+                        <!-- Price Badge -->
+                        <div class="position-absolute top-0 end-0 m-2">
+                            {% if paper.is_paid %}
+                            <span class="badge bg-warning text-dark">
+                                {{ currency_code }} {{ paper.price }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success">FREE</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                               class="text-decoration-none text-dark">
+                                {{ paper.title|truncatechars:50 }}
+                            </a>
+                        </h5>
+                        
+                        <!-- Paper Meta -->
+                        <div class="mb-3">
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                <span class="badge bg-primary">{{ paper.class_level.name }}</span>
+                                <span class="badge bg-info">{{ paper.term.name }}</span>
+                                <span class="badge bg-secondary">{{ paper.subject.name }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-file-contract me-1"></i>{{ paper.get_exam_type_display }}
+                                </span>
+                                <span class="small text-muted">
+                                    <i class="fas fa-eye me-1"></i>{{ paper.views }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Description -->
+                        {% if paper.description %}
+                        <p class="card-text small text-muted mb-3">
+                            {{ paper.description|truncatewords:15 }}
+                        </p>
+                        {% endif %}
+                        
+                        <!-- File Info -->
+                        <div class="small text-muted mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-file-alt"></i> {{ paper.pages }} pages</span>
+                                <span><i class="fas fa-hdd"></i> {{ paper.file_size|default:"N/A" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-grid">
+                            <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="text-center py-5 d-none">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No Papers Found</h4>
+            <p class="text-muted">Try adjusting your filters.</p>
+            <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                <i class="fas fa-times me-2"></i>Clear All Filters
+            </button>
+        </div>
+        
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-calendar-times fa-4x text-muted"></i>
+            </div>
+            <h3 class="mb-3">No Papers Available for {{ year }}</h3>
+            <p class="lead text-muted mb-4">
+                We don't have any papers from {{ year }} yet. Check other years or browse by class.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                {% for y in other_years|slice:":3" %}
+                <a href="{% url 'shop:papers_by_year' y %}" class="btn btn-outline-primary">
+                    {{ y }} Papers
+                </a>
+                {% endfor %}
+                <a href="{% url 'shop:all_papers' %}" class="btn btn-primary">
+                    <i class="fas fa-file-alt me-2"></i>Browse All Papers
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Year Navigation Footer -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+            <h6 class="text-center mb-3">Browse Papers from Other Years</h6>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                {% for y in available_years %}
+                <a href="{% url 'shop:papers_by_year' y %}" 
+                   class="btn btn-sm {% if y == year %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    {{ y }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function changeYear() {
+    const year = document.getElementById('yearSelect').value;
+    if (year) {
+        window.location.href = `/papers/year/${year}/`;
+    }
+}
+
+function applyFilters() {
+    const classFilter = document.getElementById('classFilter').value;
+    const subjectFilter = document.getElementById('subjectFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const priceFilter = document.getElementById('priceFilter').value;
+    
+    let visibleCount = 0;
+    const paperCards = document.querySelectorAll('.paper-card');
+    const noResults = document.getElementById('noResults');
+    
+    paperCards.forEach(card => {
+        const cardClass = card.getAttribute('data-class');
+        const cardSubject = card.getAttribute('data-subject');
+        const cardType = card.getAttribute('data-type');
+        const cardPrice = card.getAttribute('data-price');
+        
+        let showCard = true;
+        
+        // Apply filters
+        if (classFilter && cardClass !== classFilter) showCard = false;
+        if (subjectFilter && cardSubject !== subjectFilter) showCard = false;
+        if (typeFilter && cardType !== typeFilter) showCard = false;
+        if (priceFilter !== 'all') {
+            if (priceFilter === 'free' && cardPrice !== 'free') showCard = false;
+            if (priceFilter === 'paid' && cardPrice !== 'paid') showCard = false;
+        }
+        
+        if (showCard) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Show/hide no results message
+    if (visibleCount === 0) {
+        noResults.classList.remove('d-none');
+    } else {
+        noResults.classList.add('d-none');
+    }
+}
+
+function clearFilters() {
+    document.getElementById('classFilter').value = '';
+    document.getElementById('subjectFilter').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('priceFilter').value = 'all';
+    applyFilters();
+}
+
+// Initialize filters
+if (document.querySelector('.paper-card')) {
+    applyFilters();
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+F to focus on class filter
+    if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('classFilter').focus();
+    }
+    
+    // Ctrl+R to reset filters
+    if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        clearFilters();
+    }
+});
+</script>
+
+<style>
+.paper-card .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.paper-card .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    border-radius: 8px 8px 0 0;
+}
+
+.badge.bg-light {
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.position-absolute .badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+#yearSelect {
+    display: inline-block;
+    width: auto;
+}
+
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px !important;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.875rem;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

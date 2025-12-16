@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Complete - Thank You!{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Card -->
+            <div class="card text-center shadow-lg border-success border-0">
+                <div class="card-header bg-gradient-success text-white py-4">
+                    <div class="success-icon mb-3">
+                        <i class="bi bi-check-circle" style="font-size: 4rem;"></i>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-0">Payment Successful!</h1>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Order Summary -->
+                    <div class="order-summary mb-4">
+                        <h3 class="mb-3">Order Summary</h3>
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ payment.question_paper.title }}</h5>
+                                        <div class="row mb-3">
+                                            <div class="col-6 text-start">
+                                                <small class="text-muted">Class:</small>
+                                                <p class="mb-0 fw-bold">{{ payment.question_paper.class_level.name }}</p>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <small class="text-muted">Subject:</small>
+                                                <p class="mb-0 fw-bold">{{ payment.question_paper.subject.name }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <small class="text-muted">Amount Paid:</small>
+                                                <h4 class="text-success fw-bold mb-0">{{ currency_code }} {{ payment.amount_paid|default:payment.question_paper.price }}</h4>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="text-muted">Reference:</small>
+                                                <p class="mb-0 text-muted small">{{ payment.ref|truncatechars:15 }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Download Section -->
+                    <div class="download-section mb-5">
+                        <h3 class="mb-4">Download Your Paper</h3>
+                        
+                        <!-- Password Alert -->
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="bi bi-shield-lock" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading mb-2">Secure Download</h5>
+                                    <p class="mb-2">Your download password has been sent to <strong>{{ payment.phone_number }}</strong> via SMS.</p>
+                                    {% if payment.question_paper.password %}
+                                    <p class="mb-0">
+                                        <strong>Password:</strong> 
+                                        <code class="bg-light p-2 rounded">{{ payment.question_paper.password }}</code>
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Download Button -->
+                        <div class="download-action mt-4">
+                            <a href="{{ payment.question_paper.get_pdf_url }}" 
+                               class="btn btn-success btn-lg px-5 py-3"
+                               download="{{ payment.question_paper.file_name }}"
+                               onclick="trackDownload('{{ payment.question_paper.slug }}', '{{ payment.ref }}')">
+                                <i class="bi bi-cloud-arrow-down me-2"></i> Download PDF Now
+                            </a>
+                            <p class="text-muted small mt-2">
+                                <i class="bi bi-info-circle"></i> 
+                                PDF is securely hosted on our server
+                            </p>
+                        </div>
+                        
+                        <!-- Alternative Options -->
+                        <div class="alternative-options mt-4">
+                            <p class="text-muted mb-2">Having trouble downloading?</p>
+                            <div class="d-flex flex-wrap justify-content-center gap-2">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="copyDownloadLink()">
+                                    <i class="bi bi-link"></i> Copy Download Link
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="sendPasswordSms()">
+                                    <i class="bi bi-phone"></i> Resend Password
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="sendEmailReceipt()">
+                                    <i class="bi bi-envelope"></i> Email Receipt
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Steps -->
+                    <div class="next-steps mb-5">
+                        <h4 class="mb-3">What's Next?</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-file-earmark-pdf text-primary" style="font-size: 2rem;"></i>
+                                        <h6 class="mt-2">Save Your Paper</h6>
+                                        <p class="small text-muted">Download and save for offline access</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-chat-dots text-success" style="font-size: 2rem;"></i>
+                                        <h6 class="mt-2">Need Help?</h6>
+                                        <p class="small text-muted">Contact support if you encounter issues</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-cart-plus text-info" style="font-size: 2rem;"></i>
+                                        <h6 class="mt-2">Browse More</h6>
+                                        <p class="small text-muted">Check out other available papers</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons mt-4">
+                        <div class="d-flex flex-wrap justify-content-center gap-3">
+                            <a href="{% url 'shop:paper_detail' payment.question_paper.class_level.slug payment.question_paper.term.slug payment.question_paper.subject.slug payment.question_paper.slug %}" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-eye me-2"></i> View Paper Details
+                            </a>
+                            <a href="{% url 'shop:subject_list' payment.question_paper.class_level.slug payment.question_paper.term.slug %}" 
+                               class="btn btn-outline-info">
+                                <i class="bi bi-journals me-2"></i> Browse More Papers
+                            </a>
+                            <a href="{% url 'shop:class_list' %}" 
+                               class="btn btn-primary">
+                                <i class="bi bi-house me-2"></i> Return Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Receipt Footer -->
+                <div class="card-footer bg-light py-3">
+                    <div class="row">
+                        <div class="col-md-6 text-start">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ payment.date_created|date:"F d, Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Transaction ID: {{ payment.ref }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="alert alert-light border mt-4">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="bi bi-shield-check text-success" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-2">Security Information</h6>
+                        <p class="small mb-0">
+                            Your download link is secure and unique to this transaction. 
+                            The PDF file is password-protected for your security.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download Link Modal -->
+<div class="modal fade" id="downloadLinkModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Download Link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Copy this link to download your paper:</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="downloadLink" 
+                           value="{{ payment.question_paper.get_pdf_url }}" readonly>
+                    <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <small class="text-muted">This link is valid indefinitely for your account.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Track download
+function trackDownload(paperSlug, paymentRef) {
+    fetch(`/api/track-download/${paperSlug}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            payment_ref: paymentRef,
+            email: '{{ payment.email }}',
+            phone: '{{ payment.phone_number }}'
+        })
+    }).then(response => {
+        if (response.ok) {
+            console.log('Download tracked successfully');
+        }
+    });
+}
+
+// Copy download link
+function copyDownloadLink() {
+    const downloadLink = '{{ payment.question_paper.get_pdf_url }}';
+    const tempInput = document.createElement('input');
+    tempInput.value = downloadLink;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    
+    // Show toast notification
+    showToast('Download link copied to clipboard!', 'success');
+}
+
+// Copy to clipboard for modal
+function copyToClipboard() {
+    const copyText = document.getElementById("downloadLink");
+    copyText.select();
+    document.execCommand("copy");
+    showToast('Link copied to clipboard!', 'success');
+}
+
+// Show download link modal
+function showDownloadLink() {
+    const modal = new bootstrap.Modal(document.getElementById('downloadLinkModal'));
+    modal.show();
+}
+
+// Send password SMS (mock function - implement with your SMS API)
+function sendPasswordSms() {
+    fetch(`/api/resend-password/{{ payment.ref }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    }).then(response => {
+        if (response.ok) {
+            showToast('Password resent to your phone!', 'success');
+        }
+    });
+}
+
+// Send email receipt (mock function)
+function sendEmailReceipt() {
+    fetch(`/api/resend-receipt/{{ payment.ref }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    }).then(response => {
+        if (response.ok) {
+            showToast('Receipt sent to your email!', 'success');
+        }
+    });
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toastContainer = document.createElement('div');
+    toastContainer.innerHTML = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'info'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(toastContainer);
+    const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+    toast.show();
+    
+    // Remove after hide
+    toastContainer.querySelector('.toast').addEventListener('hidden.bs.toast', function () {
+        document.body.removeChild(toastContainer);
+    });
+}
+
+// Auto-click download after 3 seconds (optional)
+document.addEventListener('DOMContentLoaded', function() {
+    // Uncomment to auto-start download
+    // setTimeout(() => {
+    //     document.querySelector('.download-action .btn').click();
+    // }, 3000);
+});
+</script>
+
+<style>
+.success-icon {
+    animation: bounceIn 1s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.card-header.bg-gradient-success {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+}
+
+.download-action .btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.download-action .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(25, 135, 84, 0.2);
+}
+
+.download-action .btn:active {
+    transform: translateY(-1px);
+}
+
+.download-action .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.download-action .btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
+.order-summary .card {
+    border-left: 4px solid #198754;
+    transition: transform 0.3s ease;
+}
+
+.order-summary .card:hover {
+    transform: translateY(-5px);
+}
+
+.next-steps .card {
+    transition: all 0.3s ease;
+}
+
+.next-steps .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.action-buttons .btn {
+    min-width: 180px;
+}
+
+@media (max-width: 768px) {
+    .action-buttons .btn {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,287 @@
+<!-- templates/shop/includes/footer.html -->
+<footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container">
+        <div class="row">
+            <!-- Brand Column -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h3 class="text-info mb-3">
+                    <i class="fas fa-graduation-cap me-2"></i>Insight Innovations
+                </h3>
+                <p class="text-white-50 mb-4">
+                    Your trusted source for quality educational resources, examination papers, 
+                    and learning materials. Empowering students and educators across Ghana.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-info me-3" title="Facebook">
+                        <i class="fab fa-facebook fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-info me-3" title="Twitter">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-info me-3" title="Instagram">
+                        <i class="fab fa-instagram fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-info me-3" title="WhatsApp">
+                        <i class="fab fa-whatsapp fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-info" title="YouTube">
+                        <i class="fab fa-youtube fa-lg"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links Column -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5 class="text-white mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'shop:class_list' %}" class="text-white-50 text-decoration-none">Home</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:all_papers' %}" class="text-white-50 text-decoration-none">All Papers</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:search_papers' %}" class="text-white-50 text-decoration-none">Search Papers</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:contact_us' %}" class="text-white-50 text-decoration-none">Contact Us</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:about' %}" class="text-white-50 text-decoration-none">About Us</a></li>
+                </ul>
+            </div>
+            
+            <!-- Account Column -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="text-white mb-3">Account</h5>
+                <ul class="list-unstyled">
+                    {% if user.is_authenticated %}
+                    <li class="mb-2"><a href="{% url 'shop:profile' %}" class="text-white-50 text-decoration-none">My Profile</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:purchase_history' %}" class="text-white-50 text-decoration-none">Purchase History</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Downloads</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:logout' %}" class="text-white-50 text-decoration-none">Logout</a></li>
+                    {% else %}
+                    <li class="mb-2"><a href="{% url 'shop:login' %}" class="text-white-50 text-decoration-none">Login</a></li>
+                    <li class="mb-2"><a href="{% url 'shop:register' %}" class="text-white-50 text-decoration-none">Register</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Forgot Password</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <!-- Contact Column -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="text-white mb-3">Contact Info</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-map-marker-alt text-info me-3 mt-1"></i>
+                            <div>
+                                <h6 class="text-white mb-1">Location</h6>
+                                <p class="text-white-50 mb-0">Accra, Ghana</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-phone text-info me-3 mt-1"></i>
+                            <div>
+                                <h6 class="text-white mb-1">Phone</h6>
+                                <p class="text-white-50 mb-0">
+                                    <a href="tel:+233542232515" class="text-white-50 text-decoration-none">+233 542 232 515</a>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-envelope text-info me-3 mt-1"></i>
+                            <div>
+                                <h6 class="text-white mb-1">Email</h6>
+                                <p class="text-white-50 mb-0">
+                                    <a href="mailto:darkosammy2@gmail.com" class="text-white-50 text-decoration-none">darkosammy2@gmail.com</a>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-clock text-info me-3 mt-1"></i>
+                            <div>
+                                <h6 class="text-white mb-1">Business Hours</h6>
+                                <p class="text-white-50 mb-0">Mon - Fri: 8AM - 6PM</p>
+                                <p class="text-white-50 mb-0">Sat: 9AM - 2PM</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Newsletter -->
+        <div class="row mt-5 pt-4 border-top border-secondary">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h5 class="text-white mb-3">Stay Updated</h5>
+                <p class="text-white-50 mb-3">
+                    Subscribe to our newsletter for updates on new papers, promotions, and educational tips.
+                </p>
+                <form class="d-flex">
+                    <input type="email" class="form-control me-2" placeholder="Your email address" required>
+                    <button type="submit" class="btn btn-info">Subscribe</button>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <h5 class="text-white mb-3">Payment Methods</h5>
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <i class="fab fa-cc-mastercard fa-2x text-white-50"></i>
+                    <i class="fab fa-cc-visa fa-2x text-white-50"></i>
+                    <i class="fas fa-mobile-alt fa-2x text-white-50"></i>
+                    <i class="fas fa-university fa-2x text-white-50"></i>
+                </div>
+                <p class="text-white-50 small">
+                    We accept Mobile Money payments through Paystack. Your payments are secure and encrypted.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="row mt-5 pt-4 border-top border-secondary">
+            <div class="col-md-6">
+                <p class="text-white-50 mb-0">
+                    &copy; {% now "Y" %} Insight Innovations. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-white-50 mb-0">
+                    <a href="{% url 'shop:privacy_policy' %}" class="text-white-50 text-decoration-none me-3">Privacy Policy</a>
+                    <a href="{% url 'shop:terms_of_service' %}" class="text-white-50 text-decoration-none me-3">Terms of Service</a>
+                    <a href="{% url 'shop:faq' %}" class="text-white-50 text-decoration-none">FAQ</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Back to Top Button -->
+<button type="button" class="btn btn-info btn-floating btn-lg" id="btn-back-to-top">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<style>
+footer {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+}
+
+footer a:hover {
+    color: white !important;
+    text-decoration: underline !important;
+}
+
+.social-links a {
+    transition: transform 0.3s ease, color 0.3s ease;
+    display: inline-block;
+}
+
+.social-links a:hover {
+    transform: translateY(-3px);
+    color: white !important;
+}
+
+.list-unstyled li {
+    transition: transform 0.2s ease;
+}
+
+.list-unstyled li:hover {
+    transform: translateX(5px);
+}
+
+.form-control {
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.form-control:focus {
+    background-color: rgba(255,255,255,0.15);
+    border-color: #0dcaf0;
+    color: white;
+    box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+#btn-back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+#btn-back-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.border-secondary {
+    border-color: #495057 !important;
+}
+
+@media (max-width: 768px) {
+    footer {
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .list-unstyled li:hover {
+        transform: none;
+    }
+}
+</style>
+
+<script>
+// Back to top button
+const backToTopButton = document.getElementById("btn-back-to-top");
+
+// Show button when scrolling down
+window.addEventListener('scroll', function() {
+    if (window.pageYOffset > 300) {
+        backToTopButton.style.display = "block";
+    } else {
+        backToTopButton.style.display = "none";
+    }
+});
+
+// Scroll to top when clicked
+backToTopButton.addEventListener('click', function() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+// Newsletter form submission
+document.querySelector('footer form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = this.querySelector('input[type="email"]').value;
+    
+    // Show loading state
+    const button = this.querySelector('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Subscribing...';
+    button.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Reset button
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        // Clear input
+        this.reset();
+        
+        // Show success message
+        alert('Thank you for subscribing to our newsletter!');
+    }, 2000);
+});
+</script>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4 text-success">Free Download Ready!</h1>
+            <p class="lead">You have selected the free paper:</p>
+            <h2>{{ paper.title }}</h2>
+            
+            <p class="mt-4">Click the button below to start your download instantly. No payment or password required.</p>
+            
+            <a href="{{ file_download_url }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-download"></i> Start Download
+            </a>
+
+            <div class="mt-5 p-3 bg-light rounded">
+                <p class="text-muted small">The file will be delivered directly to your device.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

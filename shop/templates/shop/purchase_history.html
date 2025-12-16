@@ -1,0 +1,516 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Purchase History - Insight Innovations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Purchase History</h6>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-history text-primary me-3 fa-lg"></i>
+                        <div>
+                            <h5 class="mb-0">{{ total_purchases|default:"0" }}</h5>
+                            <small class="text-muted">Total Purchases</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-money-bill-wave text-success me-3 fa-lg"></i>
+                        <div>
+                            <h5 class="mb-0">GHS {{ total_spent|default:"0.00" }}</h5>
+                            <small class="text-muted">Total Spent</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-download text-info me-3 fa-lg"></i>
+                        <div>
+                            <h5 class="mb-0">{{ total_downloads|default:"0" }}</h5>
+                            <small class="text-muted">Total Downloads</small>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-2">Filter by Status</label>
+                        <select class="form-select form-select-sm" id="statusFilter">
+                            <option value="all">All Purchases</option>
+                            <option value="verified">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-2">Sort by</label>
+                        <select class="form-select form-select-sm" id="sortFilter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="price-low">Price: Low to High</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-2" id="applyFilters">
+                        <i class="fas fa-filter me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Help Card -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Need Help?</h6>
+                    <p class="small text-muted mb-3">
+                        If you're missing a purchase or have issues downloading, contact our support team.
+                    </p>
+                    <a href="{% url 'shop:contact_us' %}" class="btn btn-sm btn-outline-info w-100">
+                        <i class="fas fa-headset me-1"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Purchase History</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="printPurchaseHistory()">
+                        <i class="fas fa-print me-1"></i>Print
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="exportToCSV()">
+                        <i class="fas fa-file-export me-1"></i>Export
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8 mb-3 mb-md-0">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="searchPurchases" placeholder="Search by paper name or reference...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                <input type="month" class="form-control" id="monthFilter" value="{% now 'Y-m' %}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Purchases Table -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    {% if purchases %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="purchasesTable">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Paper Details</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for purchase in purchases %}
+                                    <tr class="purchase-row" 
+                                        data-status="{{ purchase.verified|yesno:'verified,pending' }}" 
+                                        data-date="{{ purchase.date_created|date:'Y-m-d' }}"
+                                        data-price="{{ purchase.amount_paid|default:purchase.question_paper.price }}">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    {% if purchase.question_paper.preview_image %}
+                                                    <img src="{{ purchase.question_paper.generate_thumbnail|default:purchase.question_paper.get_preview_image_url }}" 
+                                                         alt="{{ purchase.question_paper.title }}" 
+                                                         class="rounded" 
+                                                         style="width: 50px; height: 60px; object-fit: cover;">
+                                                    {% else %}
+                                                    <div class="bg-light text-center rounded d-flex align-items-center justify-content-center" 
+                                                         style="width: 50px; height: 60px;">
+                                                        <i class="fas fa-file-pdf text-danger"></i>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">
+                                                        <a href="{% url 'shop:paper_detail' purchase.question_paper.class_level.slug purchase.question_paper.term.slug purchase.question_paper.subject.slug purchase.question_paper.slug %}" 
+                                                           class="text-decoration-none">
+                                                            {{ purchase.question_paper.title|truncatechars:40 }}
+                                                        </a>
+                                                    </h6>
+                                                    <small class="text-muted">
+                                                        {{ purchase.question_paper.class_level.name }} • 
+                                                        {{ purchase.question_paper.subject.name }}
+                                                    </small>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Ref: <code>{{ purchase.ref|truncatechars:10 }}</code>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>{{ purchase.date_created|date:"M d, Y" }}</small><br>
+                                            <small class="text-muted">{{ purchase.date_created|date:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <h6 class="text-success mb-0">GHS {{ purchase.amount_paid|default:purchase.question_paper.price }}</h6>
+                                        </td>
+                                        <td>
+                                            {% if purchase.verified %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Completed
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                {% if purchase.verified %}
+                                                <a href="{% url 'shop:download_file' purchase.question_paper.slug %}?ref={{ purchase.ref }}&email={{ purchase.email|urlencode }}" 
+                                                   class="btn btn-outline-success" 
+                                                   title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                {% endif %}
+                                                <a href="{% url 'shop:payment_status' purchase.ref %}" 
+                                                   class="btn btn-outline-info" 
+                                                   title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-outline-secondary" 
+                                                        onclick="copyReference('{{ purchase.ref }}')"
+                                                        title="Copy Reference">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav class="p-3 border-top">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                        
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                            </div>
+                            <h3 class="mb-3">No Purchases Yet</h3>
+                            <p class="text-muted mb-4">
+                                You haven't made any purchases yet. Start exploring our collection of educational papers.
+                            </p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="{% url 'shop:all_papers' %}" class="btn btn-primary">
+                                    <i class="fas fa-book-open me-2"></i>Browse Papers
+                                </a>
+                                <a href="{% url 'shop:class_list' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-graduation-cap me-2"></i>Browse by Class
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Statistics Summary -->
+            {% if purchases %}
+            <div class="row mt-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h3 class="text-success mb-1">{{ completed_purchases }}</h3>
+                            <p class="text-muted small mb-0">Completed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h3 class="text-warning mb-1">{{ pending_purchases }}</h3>
+                            <p class="text-muted small mb-0">Pending</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h3 class="text-info mb-1">{{ this_month_purchases }}</h3>
+                            <p class="text-muted small mb-0">This Month</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h3 class="text-primary mb-1">GHS {{ monthly_spent }}</h3>
+                            <p class="text-muted small mb-0">Monthly Spend</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchPurchases');
+    const purchaseRows = document.querySelectorAll('.purchase-row');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            purchaseRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Filter by status
+    const statusFilter = document.getElementById('statusFilter');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', function() {
+            const selectedStatus = statusFilter.value;
+            const selectedSort = document.getElementById('sortFilter').value;
+            const selectedMonth = document.getElementById('monthFilter').value;
+            
+            // Filter by status
+            purchaseRows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const date = row.getAttribute('data-date');
+                const price = parseFloat(row.getAttribute('data-price'));
+                
+                let showRow = true;
+                
+                // Status filter
+                if (selectedStatus !== 'all' && status !== selectedStatus) {
+                    showRow = false;
+                }
+                
+                // Month filter
+                if (selectedMonth && !date.startsWith(selectedMonth)) {
+                    showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+            
+            // Sort functionality
+            const visibleRows = Array.from(purchaseRows).filter(row => row.style.display !== 'none');
+            
+            visibleRows.sort((a, b) => {
+                switch(selectedSort) {
+                    case 'newest':
+                        return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                    case 'oldest':
+                        return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                    case 'price-high':
+                        return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                    case 'price-low':
+                        return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Reorder table
+            const tbody = document.querySelector('#purchasesTable tbody');
+            visibleRows.forEach(row => {
+                tbody.appendChild(row);
+            });
+        });
+    }
+    
+    // Auto-filter by current month
+    const monthFilter = document.getElementById('monthFilter');
+    if (monthFilter) {
+        monthFilter.addEventListener('change', function() {
+            applyFiltersBtn.click();
+        });
+    }
+});
+
+// Copy reference to clipboard
+function copyReference(ref) {
+    navigator.clipboard.writeText(ref).then(() => {
+        // Show toast notification
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '11';
+        toast.innerHTML = `
+            <div class="toast show" role="alert">
+                <div class="toast-header bg-success text-white">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong class="me-auto">Copied!</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    Reference copied to clipboard: ${ref}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 3000);
+    });
+}
+
+// Print purchase history
+function printPurchaseHistory() {
+    window.print();
+}
+
+// Export to CSV (simplified version)
+function exportToCSV() {
+    const rows = document.querySelectorAll('.purchase-row:not([style*="display: none"])');
+    let csv = 'Paper,Reference,Date,Amount,Status\n';
+    
+    rows.forEach(row => {
+        const paper = row.querySelector('h6 a').textContent.trim();
+        const ref = row.querySelector('code').textContent.trim();
+        const date = row.querySelector('td:nth-child(3) small:first-child').textContent.trim();
+        const amount = row.querySelector('td:nth-child(4) h6').textContent.trim();
+        const status = row.querySelector('td:nth-child(5) .badge').textContent.trim();
+        
+        csv += `"${paper}","${ref}","${date}","${amount}","${status}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `purchase-history-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('searchPurchases').focus();
+    }
+});
+</script>
+
+<style>
+@media print {
+    .navbar, .footer, .card:not(#purchasesTable), .btn, #statusFilter, #sortFilter, #searchPurchases {
+        display: none !important;
+    }
+    
+    body {
+        padding: 0 !important;
+        background: white !important;
+    }
+    
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    #purchasesTable {
+        font-size: 12px;
+    }
+    
+    #purchasesTable img {
+        display: none;
+    }
+    
+    #purchasesTable .btn-group {
+        display: none;
+    }
+}
+
+.purchase-row:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 5px 10px;
+}
+
+.btn-group-sm .btn {
+    padding: 4px 8px;
+}
+</style>
+{% endblock %}
+{% endblock %}

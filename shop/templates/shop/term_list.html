@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}Terms for {{ class_level.name }}{% endblock page_title %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Classes</a></li>
+            <li class="breadcrumb-item active">{{ class_level.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="text-center mb-5">
+        <h1 class="text-primary fw-bold">
+            <i class="bi bi-calendar-week me-2"></i>{{ class_level.name }} Terms
+        </h1>
+        <p class="lead text-muted">
+            Select a term to browse available subjects and question papers
+        </p>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for term_obj in terms %}
+            <div class="col">
+                <a href="{% url 'shop:subject_list' class_level.slug term_obj.slug %}" class="text-decoration-none">
+                    <div class="card h-100 shadow border-0 hover-lift">
+                        <div class="card-header bg-teal-gradient text-white text-center py-4">
+                            <div class="term-icon mb-3">
+                                <i class="bi bi-journal-text" style="font-size: 3rem;"></i>
+                            </div>
+                            <h3 class="card-title mb-0 fw-bold display-6">{{ term_obj.name }}</h3>
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <p class="card-text text-muted mb-4">
+                                Access all subjects and question papers for {{ term_obj.name }}
+                            </p>
+                            
+                            <div class="term-stats mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">
+                                        <i class="bi bi-file-earmark-pdf"></i> Papers:
+                                    </span>
+                                    <span class="badge bg-primary">
+                                        {{ term_obj.get_paper_count }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">
+                                        <i class="bi bi-book"></i> Subjects:
+                                    </span>
+                                    <span class="badge bg-info">
+                                        {{ term_obj.subjects_count|default:"Multiple" }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-info">
+                                <small class="text-muted">
+                                    <i class="bi bi-check-circle text-success"></i> 
+                                    Secure PDF downloads available
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0 text-center py-3">
+                            <span class="btn btn-success px-4">
+                                <i class="bi bi-arrow-right-circle me-2"></i>Browse Subjects
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning text-center py-5">
+                    <div class="py-4">
+                        <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h4 class="alert-heading">No Terms Available</h4>
+                        <p>No terms have been added for {{ class_level.name }} yet.</p>
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin:shop_term_add' %}" class="btn btn-outline-warning mt-2">
+                            <i class="bi bi-plus-circle me-1"></i> Add Terms (Admin)
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="{% url 'shop:class_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Back to All Classes
+        </a>
+    </div>
+    
+    <div class="row justify-content-center mt-5 pt-4">
+        <div class="col-lg-8">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle me-2"></i> About {{ class_level.name }} Question Papers
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Each term contains a collection of past papers, assignments, and exams. 
+                                All documents are properly formatted and ready for download.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="download-info">
+                                <div class="d-flex align-items-center justify-content-md-end gap-2">
+                                    <i class="bi bi-download text-success" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h6 class="mb-0">Instant Access</h6>
+                                        <small class="text-muted">Download immediately</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to term cards
+    const termCards = document.querySelectorAll('.card.hover-lift');
+    
+    termCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+    
+    // Add animation to term icons
+    const termIcons = document.querySelectorAll('.term-icon');
+    termIcons.forEach((icon, index) => {
+        icon.style.opacity = '0';
+        icon.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            icon.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            icon.style.opacity = '1';
+            icon.style.transform = 'scale(1)';
+        }, 100 * index);
+    });
+});
+</script>
+
+<style>
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ADDED: Custom CSS class for Teal background */
+.bg-teal-gradient {
+    background: #008080; /* Teal primary color */
+    background: linear-gradient(135deg, #008080 0%, #004d4d 100%); /* Teal gradient for depth */
+}
+
+.term-stats {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    /* CHANGED: Updated border color to match the teal theme */
+    border-left: 4px solid #008080; 
+}
+
+.term-icon {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .term-icon {
+    transform: scale(1.1);
+}
+
+.quick-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #dee2e6;
+}
+
+.download-info {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .display-6 {
+        font-size: 2rem !important;
+    }
+    
+    .card-header {
+        padding: 1.5rem !important;
+    }
+}
+</style>
+{% endblock %}

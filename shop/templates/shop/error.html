@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Error{% endblock title %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card text-center shadow-lg border-danger border-3">
+                <div class="card-body p-5">
+                    <h1 class="text-danger display-3 mb-4">🛑 Payment Error</h1>
+                    <h2 class="mb-4">An Error Occurred</h2>
+                    
+                    <div class="alert alert-danger mt-4">
+                        <p class="lead">Insight Innovations encountered a problem initiating or verifying your payment:</p>
+                        <p><strong>{{ message }}</strong></p>
+                    </div>
+
+                    <p class="text-muted mt-4">Please try again, or check your internet connection.</p>
+                    
+                    <a href="{% url 'shop:class_list' %}" class="btn btn-secondary btn-lg mt-2">
+                        Go Back to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,37 @@
+{% load static %}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'shop:class_list' %}">Classes</a>
+        </li>
+
+        {% if paper.class_level %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'shop:term_list' paper.class_level.slug %}">
+                    {{ paper.class_level.name }}
+                </a>
+            </li>
+        {% endif %}
+
+        {% if paper.term %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'shop:subject_list' paper.class_level.slug paper.term.slug %}">
+                    {{ paper.term.name }}
+                </a>
+            </li>
+        {% endif %}
+
+        {% if paper.subject %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'shop:subject_papers_list' paper.class_level.slug paper.term.slug paper.subject.slug %}">
+                    {{ paper.subject.name }}
+                </a>
+            </li>
+        {% endif %}
+
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ paper.title }}
+        </li>
+    </ol>
+</nav>

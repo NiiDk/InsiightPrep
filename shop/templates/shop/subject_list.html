@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Classes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' class_level.slug %}">{{ class_level.name }}</a></li>
+            <li class="breadcrumb-item active">{{ term.name }} Subjects</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-gradient-teal text-white">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="bi bi-mortarboard me-2"></i>{{ class_level.name }}
+                    </h1>
+                    <p class="mb-0">
+                        <i class="bi bi-calendar-week"></i> {{ term.name }} - Available Subjects
+                    </p>
+                </div>
+                <div class="text-end mt-2 mt-md-0">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <span class="badge bg-light text-dark fs-6 p-2">
+                            <i class="bi bi-journals me-1"></i> {{ subjects_list|length }} Subjects
+                        </span>
+                        <span class="badge bg-light text-dark fs-6 p-2">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> {{ total_papers }} Papers
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body bg-faded-black text-white">
+            <p class="lead mb-0">
+                Select a subject to browse all available question papers for {{ term.name }}.
+            </p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="subjectSearch" placeholder="Search subjects by name...">
+            </div>
+        </div>
+        <div class="col-md-4 mt-2 mt-md-0">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-funnel"></i> Filter by Paper Count
+                </button>
+                <ul class="dropdown-menu w-100">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Subjects</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="has-papers">Has Papers</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="no-papers">No Papers</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="subjectsGrid">
+        {% for item in subjects_list %}
+            <div class="col subject-item" data-name="{{ item.subject.name|lower }}" data-papers="{{ item.papers|length }}">
+                <div class="card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card-body text-center p-4">
+                        <div class="subject-icon mb-3">
+                            <div class="icon-circle {% if item.papers|length > 0 %}bg-info{% else %}bg-secondary{% endif %}">
+                                {% if item.subject.icon %}
+                                    <i class="{{ item.subject.icon }} fa-2x text-white"></i>
+                                {% else %}
+                                    <i class="bi bi-book fa-2x text-white"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <h4 class="card-title text-dark fw-bold mb-2">{{ item.subject.name }}</h4>
+                        
+                        <div class="mb-3">
+                            <span class="badge {% if item.papers|length > 0 %}bg-success{% else %}bg-secondary{% endif %} rounded-pill fs-6 px-3 py-2">
+                                {{ item.papers|length }} Paper{{ item.papers|length|pluralize }}
+                            </span>
+                        </div>
+                        
+                        {% if item.subject.description %}
+                            <p class="card-text text-muted small mb-3">
+                                {{ item.subject.description|truncatewords:20 }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if item.papers|length > 0 %}
+                            <div class="latest-paper mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    Latest: 
+                                    {% with paper=item.papers.0 %}
+                                        {{ paper.year }} {{ paper.get_exam_type_display }}
+                                    {% endwith %}
+                                </small>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="action-buttons">
+                            {% if item.papers|length > 0 %}
+                                {% if item.papers|length == 1 %}
+                                    {% with paper=item.papers.0 %}
+                                        <a href="{% url 'shop:paper_detail' class_level.slug term.slug item.subject.slug paper.slug %}" 
+                                            class="btn btn-info btn-sm w-100">
+                                            <i class="bi bi-eye me-1"></i> View Paper
+                                        </a>
+                                    {% endwith %}
+                                {% else %}
+                                    <a href="{% url 'shop:subject_papers_list' class_level.slug term.slug item.subject.slug %}" 
+                                        class="btn btn-info btn-sm w-100">
+                                        <i class="bi bi-list me-1"></i> Browse {{ item.papers|length }} Papers
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                    <i class="bi bi-hourglass-split me-1"></i> Coming Soon
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent text-center pt-3 border-top-0">
+                        <div class="d-flex justify-content-center gap-2">
+                            {% if item.papers|length > 0 %}
+                                {% for paper in item.papers|slice:":3" %}
+                                    <span class="badge bg-light text-dark small">
+                                        {{ paper.exam_type|slice:":3" }}
+                                    </span>
+                                {% endfor %}
+                                {% if item.papers|length > 3 %}
+                                    <span class="badge bg-light text-dark small">
+                                        +{{ item.papers|length|add:"-3" }}
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <small class="text-muted">Papers in progress</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning text-center py-5">
+                    <div class="py-4">
+                        <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h4 class="alert-heading">No Subjects Available</h4>
+                        <p>No subjects have been added for {{ class_level.name }} {{ term.name }} yet.</p>
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin:shop_subject_add' %}" class="btn btn-outline-warning mt-2">
+                            <i class="bi bi-plus-circle me-1"></i> Add Subjects (Admin)
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div id="noSubjectsFound" class="alert alert-info text-center py-5 d-none">
+        <i class="bi bi-search fa-3x text-info mb-3"></i>
+        <h4>No Subjects Found</h4>
+        <p class="mb-0">Try adjusting your search criteria.</p>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'shop:term_list' class_level.slug %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Back to {{ class_level.name }} Terms
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('subjectSearch');
+    const subjectsGrid = document.getElementById('subjectsGrid');
+    const noResults = document.getElementById('noSubjectsFound');
+    const subjectItems = subjectsGrid ? subjectsGrid.querySelectorAll('.subject-item') : [];
+    
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let visibleCount = 0;
+            
+            subjectItems.forEach(item => {
+                const subjectName = item.getAttribute('data-name');
+                const hasPapers = item.getAttribute('data-papers') !== '0';
+                
+                if (subjectName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.classList.remove('d-none');
+                subjectsGrid.classList.add('d-none');
+            } else {
+                noResults.classList.add('d-none');
+                subjectsGrid.classList.remove('d-none');
+            }
+        });
+    }
+    
+    // Filter functionality
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filterType = this.getAttribute('data-filter');
+            let visibleCount = 0;
+            
+            subjectItems.forEach(item => {
+                const hasPapers = item.getAttribute('data-papers') !== '0';
+                
+                if (filterType === 'all' || 
+                    (filterType === 'has-papers' && hasPapers) ||
+                    (filterType === 'no-papers' && !hasPapers)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Update button text
+            const button = document.querySelector('[data-bs-toggle="dropdown"]');
+            button.innerHTML = `<i class="bi bi-funnel"></i> ${this.textContent}`;
+            
+            // Show/hide no results
+            if (visibleCount === 0) {
+                noResults.classList.remove('d-none');
+                subjectsGrid.classList.add('d-none');
+            } else {
+                noResults.classList.add('d-none');
+                subjectsGrid.classList.remove('d-none');
+            }
+        });
+    });
+    
+    // Add hover effects
+    subjectItems.forEach(item => {
+        const card = item.querySelector('.card');
+        if (card) {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '';
+            });
+        }
+    });
+    
+    // Add animation to icons
+    const icons = document.querySelectorAll('.subject-icon .icon-circle');
+    icons.forEach((icon, index) => {
+        icon.style.opacity = '0';
+        icon.style.transform = 'scale(0.5)';
+        
+        setTimeout(() => {
+            icon.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            icon.style.opacity = '1';
+            icon.style.transform = 'scale(1)';
+        }, 100 * index);
+    });
+});
+</script>
+
+<style>
+/* --- NEW CUSTOM STYLES FOR TEAL/FADED BLACK THEME --- */
+.bg-gradient-teal {
+    /* Teal/Cyan gradient for the header */
+    background-color: #20c997 !important; /* Standard teal color fallback */
+    background-image: linear-gradient(135deg, #1abc9c 0%, #17a2b8 100%) !important; /* Teal to Cyan */
+}
+
+.bg-faded-black {
+    /* A deep faded black (dark grey) for the card body */
+    background-color: #343a40 !important; /* Bootstrap 'dark' color */
+}
+
+/* Ensure text on faded black background is white */
+.bg-faded-black.text-white {
+    color: #ffffff !important;
+}
+
+/* Adjust badges inside the new dark/teal header for better contrast */
+.card-header.bg-gradient-teal .badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.8) !important; /* Slightly transparent white for contrast */
+    color: #212529 !important; /* Dark text on light badge */
+}
+/* --------------------------------------------------- */
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.subject-icon {
+    position: relative;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.latest-paper {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #198754;
+}
+
+.action-buttons .btn {
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.badge.rounded-pill {
+    font-weight: 500;
+}
+
+.card-footer .badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+}
+
+@media (max-width: 768px) {
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .icon-circle i {
+        font-size: 1.5rem !important;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}

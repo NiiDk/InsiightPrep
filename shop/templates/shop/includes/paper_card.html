@@ -1,0 +1,219 @@
+<!-- templates/shop/includes/paper_card.html -->
+<div class="paper-card h-100">
+    <div class="card h-100 shadow-sm border-0">
+        <!-- Paper Preview -->
+        <div class="position-relative">
+            {% if paper.preview_image %}
+            <img src="{% if paper.generate_thumbnail %}{{ paper.generate_thumbnail }}{% else %}{{ paper.get_preview_image_url }}{% endif %}" 
+                 class="card-img-top" 
+                 alt="{{ paper.title }}"
+                 style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                 style="height: 180px;">
+                <div class="text-center">
+                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    <p class="text-muted small mt-2">PDF Document</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Year Badge -->
+            <div class="position-absolute top-0 start-0 m-2">
+                <span class="badge bg-dark">{{ paper.year }}</span>
+            </div>
+            
+            <!-- Price Badge -->
+            <div class="position-absolute top-0 end-0 m-2">
+                {% if paper.is_paid %}
+                <span class="badge bg-warning text-dark">
+                    {{ currency_code|default:"GHS" }} {{ paper.price }}
+                </span>
+                {% else %}
+                <span class="badge bg-success">FREE</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Title -->
+            <h5 class="card-title">
+                <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                   class="text-decoration-none text-dark" 
+                   title="{{ paper.title }}">
+                    {{ paper.title|truncatechars:50 }}
+                </a>
+            </h5>
+            
+            <!-- Paper Meta -->
+            <div class="paper-meta mb-3">
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                    <span class="badge bg-primary">{{ paper.class_level.name }}</span>
+                    <span class="badge bg-info">{{ paper.term.name }}</span>
+                    <span class="badge bg-secondary">{{ paper.subject.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-file-contract me-1"></i>{{ paper.get_exam_type_display }}
+                    </span>
+                    <span class="small text-muted">
+                        <i class="fas fa-eye me-1"></i>{{ paper.views }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            {% if paper.description %}
+            <p class="card-text small text-muted mb-3">
+                {{ paper.description|truncatewords:15 }}
+            </p>
+            {% endif %}
+            
+            <!-- File Info -->
+            <div class="file-info mb-3">
+                <div class="d-flex justify-content-between small text-muted">
+                    <span><i class="fas fa-file-alt"></i> {{ paper.pages }} pages</span>
+                    <span><i class="fas fa-hdd"></i> {{ paper.file_size|default:"N/A" }}</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span><i class="fas fa-download"></i> {{ paper.downloads.count }} downloads</span>
+                    <span><i class="fas fa-calendar"></i> {{ paper.created_at|date:"M d" }}</span>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                {% if not paper.is_paid %}
+                <a href="{{ paper.get_pdf_url }}" 
+                   class="btn btn-success btn-sm w-100 mb-2"
+                   download="{{ paper.file_name }}"
+                   onclick="trackDownload('{{ paper.slug }}')">
+                    <i class="fas fa-download me-1"></i> Download Free
+                </a>
+                {% else %}
+                <a href="{% url 'shop:buy_paper' paper.slug %}" 
+                   class="btn btn-warning btn-sm w-100 mb-2">
+                    <i class="fas fa-shopping-cart me-1"></i> Buy Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-footer bg-transparent">
+            <div class="d-grid">
+                <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye me-1"></i> View Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.paper-card .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.paper-card .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.position-absolute .badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge.bg-light {
+    color: #495057;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa !important;
+}
+
+.card-title a:hover {
+    color: #0d6efd !important;
+}
+
+.paper-meta .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+.file-info {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #0d6efd;
+}
+
+.quick-actions .btn {
+    transition: all 0.3s ease;
+}
+
+.quick-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-footer {
+    border-top: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px !important;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .paper-meta .badge {
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+<script>
+// Track download for free papers
+function trackDownload(paperSlug) {
+    if (typeof trackDownloadAPI === 'function') {
+        trackDownloadAPI(paperSlug);
+    } else {
+        // Fallback if function not defined
+        fetch(`/api/track-download/${paperSlug}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        });
+    }
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
