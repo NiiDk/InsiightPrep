@@ -1,2 +1,2 @@
 # Procfile content
-web: gunicorn InsightInnovations.wsgi
+web: gunicorn InsiightPrep.wsgi

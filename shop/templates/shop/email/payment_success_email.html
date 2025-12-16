@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmation - Insight Innovations</title>
+    <title>Payment Confirmation - Insiight Prep</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -58,13 +58,70 @@
             background-color: #e8f4fd;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px<!-- templates/shop/email/payment_success_email.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmation - Insight Innovations</title>
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>✓ Payment Confirmation</h1>
+        </div>
+
+        <div class="email-body">
+            <div class="success-icon">✅</div>
+
+            <h2 style="text-align: center; color: #28a745;">Payment Successful!</h2>
+
+            <p>Dear {{ first_name }},</p>
+
+            <p>Your payment has been processed successfully. Your question paper is ready for download.</p>
+
+            <div class="order-details">
+                <strong>Your Purchase Details:</strong>
+                <ul style="margin: 10px 0;">
+                    <li><strong>Paper Title:</strong> {{ paper_title }}</li>
+                    <li><strong>Amount Paid:</strong> ₵{{ amount_paid }}</li>
+                    <li><strong>Transaction ID:</strong> {{ transaction_id }}</li>
+                    <li><strong>Date:</strong> {{ purchase_date }}</li>
+                </ul>
+            </div>
+
+            <div class="download-section">
+                <h3 style="margin-top: 0; color: #0056b3;">📥 Download Your Paper</h3>
+                <p>Use the link below to download your question paper:</p>
+                <p style="text-align: center;">
+                    <a href="{{ download_link }}" style="display: inline-block; background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Download Now</a>
+                </p>
+                <p style="color: #666; font-size: 12px;">Link expires in 48 hours</p>
+            </div>
+
+            <p>Your password for accessing the paper is: <code style="background-color: #f8f9fa; padding: 5px 10px; border-radius: 3px; font-family: monospace;">{{ password }}</code></p>
+
+            <p>If you have any questions or need assistance, please don't hesitate to contact us at support@email.com</p>
+
+            <p>Your purchase from Insiight Prep</p>
+
+            <hr style="border: none; border-top: 2px solid #ddd; margin: 20px 0;">
+
+            <div style="text-align: center; color: #666; font-size: 12px;">
+                <p style="margin: 5px 0;">Have questions?</p>
+                <p style="margin: 5px 0;">
+                    <a href="https://insiightprep.com/faq" style="color: #0056b3; text-decoration: none;">FAQ</a> | 
+                    <a href="https://insiightprep.com/contact" style="color: #0056b3; text-decoration: none;">Contact Us</a>
+                </p>
+            </div>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #ddd;">
+            <p style="margin: 0; color: #666; font-size: 12px;">
+                &copy; {% now "Y" %} Insiight Prep. All rights reserved.<br>
+                <span style="color: #999;">Keep this email for your records</span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -198,7 +255,7 @@
         <!-- Header -->
         <div class="email-header">
             <h1>🎉 Payment Successful!</h1>
-            <p>Your purchase from Insight Innovations</p>
+            <p>Your purchase from Insiight Prep</p>
         </div>
         
         <!-- Body -->
@@ -293,7 +350,7 @@
         <!-- Footer -->
         <div class="footer">
             <p style="margin: 0;">
-                &copy; {% now "Y" %} Insight Innovations. All rights reserved.<br>
+                &copy; {% now "Y" %} Insiight Prep. All rights reserved.<br>
                 This email was sent to {{ customer_email }} because you made a purchase on our website.
             </p>
             <p style="margin: 10px 0 0 0; font-size: 12px;">

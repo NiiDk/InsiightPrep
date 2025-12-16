@@ -447,6 +447,6 @@ class FreeSampleAdmin(admin.ModelAdmin):
 
 
 # Optional: Custom admin site header
-admin.site.site_header = 'InsightInnovations Administration'
-admin.site.site_title = 'InsightInnovations Admin Portal'
-admin.site.index_title = 'Welcome to InsightInnovations Admin'
+admin.site.site_header = 'InsiightPrep Administration'
+admin.site.site_title = 'InsiightPrep Admin Portal'
+admin.site.index_title = 'Welcome to InsiightPrep Admin'
