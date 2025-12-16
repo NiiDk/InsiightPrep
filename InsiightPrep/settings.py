@@ -18,8 +18,8 @@ ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.s
 # Add additional hosts
 additional_hosts = [
     config('NGROK_TUNNEL', default='').replace('https://', '').replace('http://', '').split('/')[0],
-    '.render.com',
-    'InsightInnovations.onrender.com',
+    '.netlify.app',
+    'insiightprep.netlify.app',
     config('RENDER_EXTERNAL_HOSTNAME', default=''),
 ]
 for host in additional_hosts:
