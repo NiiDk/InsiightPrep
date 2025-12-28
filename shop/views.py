@@ -183,6 +183,9 @@ def cart_detail(request):
 def checkout(request):
     cart = Cart(request)
     if not cart: return redirect('shop:class_list')
+    
+    total_price = cart.get_total_price()
+    
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
@@ -190,11 +193,21 @@ def checkout(request):
                 user=request.user if request.user.is_authenticated else None,
                 email=form.cleaned_data['email'],
                 phone_number=form.cleaned_data['phone_number'],
-                total_amount=cart.get_total_price()
+                total_amount=total_price
             )
             for item in cart:
                 OrderItem.objects.create(order=order, paper=item['paper'], price=item['price'])
             
+            # Handle Free Order (Total = 0)
+            if total_price == 0:
+                order.verified = True
+                order.save()
+                send_sms_fulfillment(order.phone_number, order.items.all())
+                cart.clear()
+                # Use redirect() with reverse and parameters correctly
+                return redirect(f"{reverse('shop:order_callback')}?reference={order.ref}")
+
+            # Paystack API Call for Paid Orders
             url = "https://api.paystack.co/transaction/initialize"
             headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}", "Content-Type": "application/json"}
             data = {
@@ -206,6 +219,8 @@ def checkout(request):
             if res.get('status'):
                 cart.clear()
                 return redirect(res['data']['authorization_url'])
+            else:
+                return render(request, 'shop/error.html', {'message': 'Payment initiation failed.'})
     else:
         initial = {}
         if request.user.is_authenticated:
@@ -214,12 +229,19 @@ def checkout(request):
             except:
                 initial = {'email': request.user.email}
         form = CheckoutForm(initial=initial)
-    return render(request, 'shop/checkout.html', {'cart': cart, 'form': form})
+    
+    return render(request, 'shop/checkout.html', {
+        'cart': cart, 
+        'form': form,
+        'total_price': total_price
+    })
 
 def order_callback(request):
     reference = request.GET.get('reference')
     order = get_object_or_404(Order, ref=reference)
-    if not order.verified:
+    
+    # If total price is > 0, we need to verify with Paystack
+    if not order.verified and order.total_amount > 0:
         headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}", "Content-Type": "application/json"}
         res = requests.get(f"https://api.paystack.co/transaction/verify/{reference}", headers=headers).json()
         if res.get('status') and res['data']['status'] == 'success':
@@ -227,6 +249,7 @@ def order_callback(request):
             order.transaction_id = res['data']['id']
             order.save()
             send_sms_fulfillment(order.phone_number, order.items.all())
+    
     return render(request, 'shop/order_complete.html', {'order': order})
 
 # ====================================================================
@@ -257,6 +280,13 @@ def subject_list(request, class_slug, term_slug):
 def paper_detail(request, class_slug, term_slug, subject_slug, paper_slug):
     paper = get_object_or_404(QuestionPaper, class_level__slug=class_slug, term__slug=term_slug, subject__slug=subject_slug, slug=paper_slug, is_available=True)
     return render(request, 'shop/paper_detail.html', {'paper': paper, 'cart_paper_form': CartAddPaperForm()})
+
+def download_file(request, paper_slug):
+    paper = get_object_or_404(QuestionPaper, slug=paper_slug)
+    if not paper.is_available:
+        raise Http404("Not available.")
+    DownloadHistory.log_download(paper=paper, request=request)
+    return redirect(paper.get_secure_pdf_url())
 
 # ====================================================================
 # OTHERS

@@ -49,7 +49,8 @@
                         </div>
                     </div>
 
-                    <!-- Security Notice -->
+                    <!-- Security Notice (Only if not free) -->
+                    {% if total_price > 0 %}
                     <div class="security-note mb-4">
                         <div class="d-flex align-items-start gap-3">
                             <div class="security-icon">
@@ -61,11 +62,16 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
 
                     <button type="submit"
                             class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-sm">
-                        Complete Purchase
-                        <i class="fas fa-lock ms-2"></i>
+                        {% if total_price == 0 %}
+                            Download for Free
+                        {% else %}
+                            Complete Purchase
+                        {% endif %}
+                        <i class="fas {% if total_price == 0 %}fa-download{% else %}fa-lock{% endif %} ms-2"></i>
                     </button>
                 </form>
             </div>
@@ -96,7 +102,11 @@
                         </div>
 
                         <div class="fw-semibold small">
-                            GHS {{ item.price }}
+                            {% if item.paper.is_free %}
+                                <span class="text-success">FREE</span>
+                            {% else %}
+                                GHS {{ item.price }}
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -125,7 +135,8 @@
                     </span>
                 </div>
 
-                <!-- Payment Logos -->
+                <!-- Payment Logos (Only if not free) -->
+                {% if total_price > 0 %}
                 <div class="mt-5 text-center payment-logos">
                     <i class="fab fa-cc-visa fa-2x me-3"></i>
                     <i class="fab fa-cc-mastercard fa-2x me-3"></i>
@@ -133,6 +144,7 @@
                          alt="Paystack"
                          class="paystack-logo">
                 </div>
+                {% endif %}
 
             </div>
         </div>

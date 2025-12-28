@@ -47,12 +47,23 @@
                                         <div class="small text-muted">
                                             {{ paper.class_level.name }} • {{ paper.subject.name }}
                                         </div>
+                                        {% if paper.is_free %}
+                                        <div class="mt-2">
+                                            <a href="{{ paper.pdf_file.url }}" class="btn btn-sm btn-success-soft rounded-pill px-3 fw-bold" download>
+                                                <i class="fas fa-download me-1"></i> Download Now (Free)
+                                            </a>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </td>
 
                             <td class="text-center fw-semibold text-primary">
-                                GHS {{ item.price }}
+                                {% if paper.is_free %}
+                                    <span class="text-success">FREE</span>
+                                {% else %}
+                                    GHS {{ item.price }}
+                                {% endif %}
                             </td>
 
                             <td class="text-center pe-4">
@@ -103,11 +114,16 @@
 
                 <a href="{% url 'shop:checkout' %}"
                    class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-sm">
-                    Proceed to Checkout
+                    {% if cart.get_total_price == 0 %}
+                        Download for Free
+                    {% else %}
+                        Proceed to Checkout
+                    {% endif %}
                     <i class="fas fa-arrow-right ms-2"></i>
                 </a>
 
-                <!-- Secure Payment -->
+                <!-- Secure Payment Info (Only show if not free) -->
+                {% if cart.get_total_price > 0 %}
                 <div class="secure-box mt-4 text-center">
                     <div class="small text-muted mb-2 fw-semibold">
                         VERIFIED SECURE
@@ -120,6 +136,7 @@
                          alt="Paystack"
                          class="paystack-logo">
                 </div>
+                {% endif %}
 
             </div>
         </div>
@@ -204,6 +221,16 @@
     .btn-light-danger:hover {
         background: #fee2e2;
         color: #dc2626;
+    }
+
+    .btn-success-soft {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+    }
+    .btn-success-soft:hover {
+        background: #dcfce7;
+        color: #15803d;
     }
 
     /* Secure Payment */
