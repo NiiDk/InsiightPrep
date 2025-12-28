@@ -4,86 +4,86 @@
 {% block page_title %}Terms for {{ class_level.name }} | InsiightPrep{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-4">
     <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-4 animate__animated animate__fadeIn">
-        <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm border">
-            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}" class="text-decoration-none text-indigo fw-medium">Grades</a></li>
-            <li class="breadcrumb-item active fw-bold text-slate-600">{{ class_level.name }}</li>
+    <nav aria-label="breadcrumb" class="mb-3 animate__animated animate__fadeIn">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm border mb-0">
+            <li class="breadcrumb-item small"><a href="{% url 'shop:class_list' %}" class="text-decoration-none text-indigo fw-medium">Grades</a></li>
+            <li class="breadcrumb-item active small fw-bold text-slate-600">{{ class_level.name }}</li>
         </ol>
     </nav>
     
-    <div class="text-center mb-5 animate__animated animate__fadeInDown">
-        <h1 class="display-5 fw-bold mb-2">
+    <div class="text-center mb-4 animate__animated animate__fadeInDown">
+        <h1 class="h2 fw-bold mb-1">
             <span class="text-indigo-gradient">{{ class_level.name }}</span> Terms
         </h1>
-        <p class="text-slate-500 lead mx-auto" style="max-width: 600px;">
-            Select a specific academic term to access all relevant subjects and examination papers.
+        <p class="text-slate-500 x-small mx-auto mb-3" style="max-width: 500px;">
+            Choose a term to view subjects and examination papers.
         </p>
         
-        <!-- Mobile Menu Quick Nav -->
-        <div class="quick-nav-wrapper mt-4">
+        <!-- Mobile Menu Quick Nav (Compact) -->
+        <div class="quick-nav-wrapper mt-2">
             <div class="quick-nav-scroll">
-                <a href="{% url 'shop:class_list' %}" class="quick-nav-pill">
-                    <i class="fas fa-home me-2"></i> Home
+                <a href="{% url 'shop:class_list' %}" class="quick-nav-pill py-1 px-3">
+                    <i class="fas fa-home me-1"></i> Home
                 </a>
-                <a href="{% url 'shop:all_papers' %}" class="quick-nav-pill">
-                    <i class="fas fa-file-lines me-2"></i> All Papers
+                <a href="{% url 'shop:all_papers' %}" class="quick-nav-pill py-1 px-3">
+                    <i class="fas fa-file-lines me-1"></i> Papers
                 </a>
-                <a href="{% url 'shop:faq' %}" class="quick-nav-pill">
-                    <i class="fas fa-circle-question me-2"></i> FAQ
+                <a href="{% url 'shop:faq' %}" class="quick-nav-pill py-1 px-3">
+                    <i class="fas fa-circle-question me-1"></i> FAQ
                 </a>
-                <a href="{% url 'shop:contact_us' %}" class="quick-nav-pill">
-                    <i class="fas fa-headset me-2"></i> Support
+                <a href="{% url 'shop:contact_us' %}" class="quick-nav-pill py-1 px-3">
+                    <i class="fas fa-headset me-1"></i> Help
                 </a>
             </div>
         </div>
     </div>
     
-    <div class="row g-4 mb-5 row-cols-1 row-cols-md-2 row-cols-xl-3 justify-content-center">
+    <div class="row g-3 mb-4 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-center">
         {% for term_obj in terms %}
             <div class="col animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
                 <a href="{% url 'shop:subject_list' class_level.slug term_obj.slug %}" class="text-decoration-none group">
                     <div class="modern-card card-indigo compact-card h-100">
                         <div class="card-glow-indigo"></div>
-                        <div class="d-flex align-items-center justify-content-between mb-4 position-relative">
+                        <div class="d-flex align-items-center justify-content-between mb-2 position-relative">
                             <div class="term-icon-box-indigo">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                             <span class="paper-badge-indigo">
-                                Term {{ forloop.counter }}
+                                {{ forloop.counter }}
                             </span>
                         </div>
                         
-                        <h3 class="fw-bold text-slate-800 mb-2 group-hover:text-indigo transition-colors position-relative">
+                        <h6 class="fw-bold text-slate-800 mb-1 group-hover:text-indigo transition-colors position-relative">
                             {{ term_obj.name }}
-                        </h3>
+                        </h6>
                         
-                        <p class="text-slate-500 small mb-4 flex-grow-1 position-relative">
-                            Browse all subjects and download secured PDF examination papers for {{ term_obj.name }}.
+                        <p class="text-slate-500 xx-small mb-3 flex-grow-1 position-relative">
+                            Download secured papers for {{ term_obj.name }}.
                         </p>
                         
                         <div class="term-meta position-relative">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-slate-400 x-small">Available Papers</span>
-                                <span class="fw-bold text-indigo">{{ term_obj.get_paper_count }}</span>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-slate-400 xx-small">Papers</span>
+                                <span class="fw-bold text-indigo xx-small">{{ term_obj.get_paper_count }}</span>
                             </div>
-                            <div class="progress" style="height: 6px; background: #e0e7ff;">
+                            <div class="progress" style="height: 4px; background: #e0e7ff;">
                                 <div class="progress-bar bg-indigo-gradient" style="width: 100%"></div>
                             </div>
                         </div>
                         
-                        <div class="mt-4 d-flex align-items-center text-indigo fw-bold position-relative">
-                            View Subjects <i class="fas fa-arrow-right ms-2 fs-xs"></i>
+                        <div class="mt-3 d-flex align-items-center text-indigo fw-bold xx-small position-relative">
+                            View Subjects <i class="fas fa-arrow-right ms-1 fs-xs"></i>
                         </div>
                     </div>
                 </a>
             </div>
         {% empty %}
             <div class="col-12 text-center py-5">
-                <img src="https://illustrations.popsy.co/slate/empty-folder.svg" style="width: 180px;" alt="Empty">
+                <img src="https://illustrations.popsy.co/slate/empty-folder.svg" style="width: 150px;" alt="Empty">
                 <h4 class="mt-4 fw-bold">No terms found</h4>
-                <p class="text-slate-500">Terms for {{ class_level.name }} are being updated.</p>
+                <p class="text-slate-500">Terms are being updated.</p>
             </div>
         {% endfor %}
     </div>
@@ -103,35 +103,34 @@
         -webkit-text-fill-color: transparent;
     }
 
-    /* Card Specific Indigo Styling */
+    /* Card Specific Indigo Styling - Compact */
     .card-indigo {
-        border-left: 4px solid var(--indigo-primary) !important;
+        border-left: 3px solid var(--indigo-primary) !important;
         background: #ffffff !important;
     }
     .card-indigo:hover {
         border-color: var(--indigo-dark) !important;
-        background: #f5f7ff !important; /* Indigo 50 */
+        background: #f5f7ff !important;
     }
     .term-icon-box-indigo {
-        width: 52px;
-        height: 52px;
+        width: 36px;
+        height: 36px;
         background: var(--indigo-gradient);
         color: white;
-        border-radius: 1rem;
+        border-radius: 0.6rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
-        box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
+        font-size: 0.9rem;
+        box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.3);
     }
     .paper-badge-indigo {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 600;
         color: var(--indigo-dark);
-        background: #e0e7ff; /* Indigo 100 */
-        padding: 0.3rem 0.75rem;
+        background: #e0e7ff;
+        padding: 0.2rem 0.6rem;
         border-radius: 2rem;
-        text-transform: uppercase;
     }
     .card-glow-indigo {
         position: absolute;
@@ -139,7 +138,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08), transparent 70%);
+        background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05), transparent 70%);
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -148,22 +147,23 @@
     
     .bg-indigo-gradient { background: var(--indigo-gradient); }
 
-    .x-small { font-size: 0.75rem; }
-    .fs-xs { font-size: 0.7rem; }
-    .compact-card { padding: 1.25rem !important; border-radius: 1rem !important; overflow: hidden; position: relative; }
+    .x-small { font-size: 0.8rem; }
+    .xx-small { font-size: 0.7rem; }
+    .fs-xs { font-size: 0.65rem; }
+    .compact-card { padding: 1rem !important; border-radius: 0.75rem !important; overflow: hidden; position: relative; }
 
-    /* Quick Nav */
-    .quick-nav-wrapper { overflow: hidden; margin-bottom: 1rem; }
-    .quick-nav-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+    /* Quick Nav Compact */
+    .quick-nav-wrapper { overflow: hidden; }
+    .quick-nav-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
     .quick-nav-pill {
-        display: inline-flex; align-items: center; padding: 0.5rem 1.25rem; background: white;
+        display: inline-flex; align-items: center; background: white;
         border: 1px solid #e2e8f0; border-radius: 2rem; color: #64748b; text-decoration: none;
-        font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;
+        font-size: 0.75rem; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;
     }
-    .quick-nav-pill:hover { background: #f8fafc; border-color: var(--indigo-primary); color: var(--indigo-dark); transform: translateY(-2px); }
+    .quick-nav-pill:hover { background: #f8fafc; border-color: var(--indigo-primary); color: var(--indigo-dark); transform: translateY(-1px); }
 
     @media (max-width: 768px) {
-        .quick-nav-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+        .quick-nav-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding-bottom: 0.25rem; scrollbar-width: none; }
         .quick-nav-scroll::-webkit-scrollbar { display: none; }
     }
 </style>

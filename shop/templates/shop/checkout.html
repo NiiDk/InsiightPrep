@@ -5,45 +5,67 @@
 
 {% block content %}
 <div class="container py-5">
+
+    <!-- Header -->
     <div class="text-center mb-5 animate__animated animate__fadeIn">
-        <h1 class="display-5 fw-bold mb-2">Secure <span class="text-primary-gradient">Checkout</span></h1>
-        <p class="text-slate-500">Provide your details to receive your examination papers instantly.</p>
+        <h1 class="display-5 fw-bold mb-2">
+            Secure <span class="text-primary-gradient">Checkout</span>
+        </h1>
+        <p class="text-muted">
+            Provide your details to receive your examination papers instantly.
+        </p>
     </div>
 
     <div class="row g-4">
+
         <!-- Checkout Form -->
         <div class="col-lg-7 animate__animated animate__fadeInLeft">
-            <div class="modern-card p-4 p-md-5">
+            <div class="modern-card p-4 p-md-5 shadow-sm border-0">
+
                 <h5 class="fw-bold mb-4">Customer Information</h5>
-                
+
                 <form action="." method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    
+
                     <div class="mb-4">
-                        <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold text-slate-700">Email Address</label>
+                        <label for="{{ form.email.id_for_label }}"
+                               class="form-label fw-semibold text-dark">
+                            Email Address
+                        </label>
                         {{ form.email }}
-                        <div class="x-small text-slate-400 mt-2">We'll send your receipt and download links here.</div>
+                        <div class="small text-muted mt-2">
+                            Your receipt and download links will be sent here.
+                        </div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-semibold text-slate-700">Mobile Money Number</label>
+                        <label for="{{ form.phone_number.id_for_label }}"
+                               class="form-label fw-semibold text-dark">
+                            Mobile Money Number
+                        </label>
                         {{ form.phone_number }}
-                        <div class="x-small text-slate-400 mt-2">Crucial: Your paper passwords will be sent here via SMS.</div>
+                        <div class="small text-muted mt-2">
+                            Your paper passwords will be sent here via SMS.
+                        </div>
                     </div>
 
-                    <div class="p-4 rounded-4 bg-slate-50 border border-dashed mb-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="p-2 rounded-circle bg-white text-primary shadow-sm">
+                    <!-- Security Notice -->
+                    <div class="security-note mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="security-icon">
                                 <i class="fas fa-shield-halved"></i>
                             </div>
-                            <div class="small text-slate-600">
-                                Your payment is processed securely by <strong>Paystack</strong>. We do not store your sensitive payment data.
+                            <div class="small text-muted">
+                                Payments are securely processed by <strong>Paystack</strong>.
+                                InsiightPrep does not store your payment details.
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-lg mt-2">
-                        Complete Purchase <i class="fas fa-lock ms-2"></i>
+                    <button type="submit"
+                            class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-sm">
+                        Complete Purchase
+                        <i class="fas fa-lock ms-2"></i>
                     </button>
                 </form>
             </div>
@@ -51,53 +73,130 @@
 
         <!-- Order Summary -->
         <div class="col-lg-5 animate__animated animate__fadeInRight">
-            <div class="modern-card p-4 sticky-top" style="top: 100px;">
+            <div class="modern-card p-4 shadow-sm border-0 sticky-top order-summary"
+                 style="top: 100px;">
+
                 <h5 class="fw-bold mb-4">Your Order</h5>
-                
-                <div class="order-items-list mb-4">
+
+                <!-- Items -->
+                <div class="order-items mb-4">
                     {% for item in cart %}
-                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-slate-50">
-                            <div class="p-2 rounded-3 bg-slate-50 border">
-                                <i class="fas fa-file-pdf text-danger"></i>
-                            </div>
-                            <div class="flex-grow-1 overflow-hidden">
-                                <div class="fw-bold small text-truncate">{{ item.paper.title }}</div>
-                                <div class="x-small text-slate-400">{{ item.paper.subject.name }}</div>
-                            </div>
-                            <div class="fw-bold small">GHS {{ item.price }}</div>
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <div class="pdf-badge">
+                            <i class="fas fa-file-pdf"></i>
                         </div>
+
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="fw-semibold small text-truncate">
+                                {{ item.paper.title }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ item.paper.subject.name }}
+                            </div>
+                        </div>
+
+                        <div class="fw-semibold small">
+                            GHS {{ item.price }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
 
                 <div class="d-flex justify-content-between mb-2">
-                    <span class="text-slate-500 small">Subtotal</span>
-                    <span class="text-slate-800 small">GHS {{ cart.get_total_price }}</span>
-                </div>
-                <div class="d-flex justify-content-between mb-4">
-                    <span class="text-slate-500 small">Delivery</span>
-                    <span class="text-success x-small fw-bold">INSTANT</span>
-                </div>
-                
-                <hr class="border-slate-100 mb-4">
-                
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold fs-5">Total</span>
-                    <span class="fw-bold fs-4 text-primary">GHS {{ cart.get_total_price }}</span>
+                    <span class="small text-muted">Subtotal</span>
+                    <span class="small fw-semibold">
+                        GHS {{ cart.get_total_price }}
+                    </span>
                 </div>
 
-                <div class="mt-5 text-center">
-                    <div class="d-flex justify-content-center gap-3 opacity-50 grayscale">
-                        <i class="fab fa-cc-visa fa-2x"></i>
-                        <i class="fab fa-cc-mastercard fa-2x"></i>
-                        <img src="https://paystack.com/assets/img/login/paystack-logo.png" style="height: 20px; margin-top: 10px;" alt="Paystack">
-                    </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="small text-muted">Delivery</span>
+                    <span class="small fw-semibold text-success">
+                        INSTANT
+                    </span>
                 </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold fs-5">Total</span>
+                    <span class="fw-bold fs-4 text-primary">
+                        GHS {{ cart.get_total_price }}
+                    </span>
+                </div>
+
+                <!-- Payment Logos -->
+                <div class="mt-5 text-center payment-logos">
+                    <i class="fab fa-cc-visa fa-2x me-3"></i>
+                    <i class="fab fa-cc-mastercard fa-2x me-3"></i>
+                    <img src="https://paystack.com/assets/img/login/paystack-logo.png"
+                         alt="Paystack"
+                         class="paystack-logo">
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .grayscale { filter: grayscale(1); }
+    /* ===============================
+       COLOUR SYSTEM
+    ================================ */
+
+    .text-primary-gradient {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #ffffff;
+        border: none;
+    }
+
+    .btn-primary-gradient:hover {
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+    }
+
+    .order-summary {
+        background: linear-gradient(180deg, #f8faff 0%, #ffffff 70%);
+        border-left: 4px solid #6366f1;
+    }
+
+    /* Security */
+    .security-note {
+        background: #f8faff;
+        border: 1px dashed #c7d2fe;
+        border-radius: 16px;
+        padding: 16px;
+    }
+
+    .security-icon {
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        padding: 10px;
+        border-radius: 50%;
+    }
+
+    /* Items */
+    .pdf-badge {
+        background: #fef2f2;
+        color: #ef4444;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    /* Payments */
+    .payment-logos {
+        opacity: 0.55;
+        filter: grayscale(1);
+    }
+
+    .paystack-logo {
+        height: 22px;
+        vertical-align: middle;
+    }
 </style>
 {% endblock %}

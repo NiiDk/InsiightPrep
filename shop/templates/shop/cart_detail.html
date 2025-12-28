@@ -5,118 +5,219 @@
 
 {% block content %}
 <div class="container py-5">
+
+    <!-- Page Header -->
     <div class="text-center mb-5 animate__animated animate__fadeIn">
-        <h1 class="display-5 fw-bold mb-2">Your <span class="text-primary-gradient">Shopping Cart</span></h1>
-        <p class="text-slate-500">Review your selected examination papers before proceeding to checkout.</p>
+        <h1 class="display-5 fw-bold mb-2">
+            Your <span class="text-primary-gradient">Shopping Cart</span>
+        </h1>
+        <p class="text-muted">
+            Review your selected examination papers before proceeding to checkout.
+        </p>
     </div>
 
     {% if cart %}
-        <div class="row g-4">
-            <!-- Cart Items -->
-            <div class="col-lg-8 animate__animated animate__fadeInLeft">
-                <div class="modern-card p-0 overflow-hidden">
-                    <div class="table-responsive">
-                        <table class="table table-borderless align-middle mb-0">
-                            <thead class="bg-slate-50 border-bottom">
-                                <tr>
-                                    <th class="ps-4 py-3 text-slate-400 x-small text-uppercase tracking-wider">Product</th>
-                                    <th class="py-3 text-slate-400 x-small text-uppercase tracking-wider text-center">Price</th>
-                                    <th class="py-3 text-slate-400 x-small text-uppercase tracking-wider text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in cart %}
-                                    {% with paper=item.paper %}
-                                        <tr class="border-bottom border-slate-100">
-                                            <td class="ps-4 py-4">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="p-2 rounded-3 bg-slate-50 border border-dashed">
-                                                        <i class="fas fa-file-pdf text-danger fa-lg"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold text-slate-800">{{ paper.title }}</div>
-                                                        <div class="x-small text-slate-400">{{ paper.class_level.name }} • {{ paper.subject.name }}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center py-4">
-                                                <span class="fw-bold text-primary">GHS {{ item.price }}</span>
-                                            </td>
-                                            <td class="text-center py-4 pe-4">
-                                                <a href="{% url 'shop:cart_remove' paper.id %}" class="btn btn-light-danger btn-sm rounded-circle">
-                                                    <i class="fas fa-trash-can"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% endwith %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="mt-4">
-                    <a href="{% url 'shop:all_papers' %}" class="btn btn-light border px-4">
-                        <i class="fas fa-arrow-left me-2"></i> Continue Shopping
-                    </a>
+    <div class="row g-4">
+
+        <!-- Cart Items -->
+        <div class="col-lg-8 animate__animated animate__fadeInLeft">
+            <div class="modern-card p-0 overflow-hidden border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="cart-table-head">
+                        <tr>
+                            <th class="ps-4 py-3 small text-uppercase text-muted">Product</th>
+                            <th class="py-3 small text-uppercase text-muted text-center">Price</th>
+                            <th class="py-3 small text-uppercase text-muted text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in cart %}
+                        {% with paper=item.paper %}
+                        <tr class="cart-row">
+                            <td class="ps-4 py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="pdf-badge">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold text-dark">
+                                            {{ paper.title }}
+                                        </div>
+                                        <div class="small text-muted">
+                                            {{ paper.class_level.name }} • {{ paper.subject.name }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="text-center fw-semibold text-primary">
+                                GHS {{ item.price }}
+                            </td>
+
+                            <td class="text-center pe-4">
+                                <a href="{% url 'shop:cart_remove' paper.id %}"
+                                   class="btn btn-light-danger btn-sm rounded-circle">
+                                    <i class="fas fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endwith %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Order Summary -->
-            <div class="col-lg-4 animate__animated animate__fadeInRight">
-                <div class="modern-card p-4 sticky-top" style="top: 100px;">
-                    <h5 class="fw-bold mb-4">Order Summary</h5>
-                    
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-slate-500">Items ({{ cart|length }})</span>
-                        <span class="text-slate-800">GHS {{ cart.get_total_price }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="text-slate-500">Processing Fee</span>
-                        <span class="text-success x-small fw-bold">FREE</span>
-                    </div>
-                    
-                    <hr class="border-slate-100 mb-4">
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="fw-bold fs-5">Total</span>
-                        <span class="fw-bold fs-4 text-primary">GHS {{ cart.get_total_price }}</span>
-                    </div>
-
-                    <a href="{% url 'shop:checkout' %}" class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-lg">
-                        Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
-
-                    <div class="mt-4 p-3 bg-slate-50 rounded-4 border border-dashed text-center">
-                        <div class="x-small text-slate-400 mb-2">SECURE PAYMENTS BY</div>
-                        <img src="https://paystack.com/assets/img/login/paystack-logo.png" style="height: 20px; opacity: 0.6; filter: grayscale(1);" alt="Paystack">
-                    </div>
-                </div>
+            <div class="mt-4">
+                <a href="{% url 'shop:all_papers' %}" class="btn btn-outline-primary px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                </a>
             </div>
         </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4 animate__animated animate__fadeInRight">
+            <div class="modern-card p-4 shadow-sm sticky-top order-summary" style="top: 100px;">
+
+                <h5 class="fw-bold mb-4">Order Summary</h5>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Items ({{ cart|length }})</span>
+                    <span class="fw-semibold">GHS {{ cart.get_total_price }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="text-muted">Processing Fee</span>
+                    <span class="text-success fw-semibold small">FREE</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold fs-5">Total</span>
+                    <span class="fw-bold fs-4 text-primary">
+                        GHS {{ cart.get_total_price }}
+                    </span>
+                </div>
+
+                <a href="{% url 'shop:checkout' %}"
+                   class="btn btn-primary-gradient w-100 py-3 fw-bold shadow-sm">
+                    Proceed to Checkout
+                    <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+
+                <!-- Secure Payment -->
+                <div class="secure-box mt-4 text-center">
+                    <div class="small text-muted mb-2 fw-semibold">
+                        VERIFIED SECURE
+                    </div>
+                    <div class="fw-bold text-primary mb-3">
+                        InsiightPrep Protection
+                    </div>
+
+                    <img src="https://paystack.com/assets/img/login/paystack-logo.png"
+                         alt="Paystack"
+                         class="paystack-logo">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     {% else %}
-        <div class="text-center py-5 animate__animated animate__zoomIn">
-            <div class="mx-auto bg-slate-100 rounded-circle d-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px;">
-                <i class="fas fa-cart-shopping fs-1 text-slate-300"></i>
-            </div>
-            <h3 class="fw-bold">Your cart is empty</h3>
-            <p class="text-slate-500 mb-4">Looks like you haven't added any papers to your cart yet.</p>
-            <a href="{% url 'shop:all_papers' %}" class="btn btn-primary-gradient px-5 py-3 rounded-pill fw-bold">
-                Start Browsing
-            </a>
-        </div>
+
+    <!-- Empty Cart -->
+    <div class="text-center py-5 animate__animated animate__zoomIn">
+        <h3 class="fw-bold mb-2">Your cart is empty</h3>
+        <p class="text-muted mb-4">
+            Looks like you haven't added any papers yet.
+        </p>
+        <a href="{% url 'shop:all_papers' %}"
+           class="btn btn-primary-gradient px-5 py-3 rounded-pill fw-bold">
+            Start Browsing
+        </a>
+    </div>
+
     {% endif %}
 </div>
 
 <style>
+    /* ===============================
+       COLOUR SYSTEM
+    ================================ */
+
+    .text-primary-gradient {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .cart-table-head {
+        background: #f8faff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .cart-row {
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .pdf-badge {
+        background: #fef2f2;
+        color: #ef4444;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 18px;
+    }
+
+    .order-summary {
+        background: linear-gradient(180deg, #f8faff 0%, #ffffff 70%);
+        border-left: 4px solid #6366f1;
+    }
+
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #ffffff;
+        border: none;
+    }
+
+    .btn-primary-gradient:hover {
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+    }
+
+    .btn-outline-primary {
+        border-color: #6366f1;
+        color: #6366f1;
+    }
+
+    .btn-outline-primary:hover {
+        background: #6366f1;
+        color: #ffffff;
+    }
+
     .btn-light-danger {
         background: #fef2f2;
         color: #ef4444;
         border: none;
     }
+
     .btn-light-danger:hover {
         background: #fee2e2;
         color: #dc2626;
+    }
+
+    /* Secure Payment */
+    .secure-box {
+        background: #f8faff;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px dashed #c7d2fe;
+    }
+
+    .paystack-logo {
+        height: 22px;
+        opacity: 0.7;
+        filter: grayscale(1);
     }
 </style>
 {% endblock %}

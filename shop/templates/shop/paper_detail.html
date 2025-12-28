@@ -5,175 +5,263 @@
 
 {% block content %}
 <div class="container py-5">
+
     <!-- Breadcrumbs -->
     <nav aria-label="breadcrumb" class="mb-4 animate__animated animate__fadeIn">
         <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm border">
-            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}" class="text-decoration-none text-primary fw-medium">Grades</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' paper.class_level.slug %}" class="text-decoration-none text-primary fw-medium">{{ paper.class_level.name }}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'shop:subject_list' paper.class_level.slug paper.term.slug %}" class="text-decoration-none text-primary fw-medium">{{ paper.term.name }}</a></li>
+            <li class="breadcrumb-item small">
+                <a href="{% url 'shop:class_list' %}" class="text-decoration-none text-primary fw-medium">Grades</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'shop:term_list' paper.class_level.slug %}" class="text-decoration-none text-primary fw-medium">
+                    {{ paper.class_level.name }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'shop:subject_list' paper.class_level.slug paper.term.slug %}" class="text-decoration-none text-primary fw-medium">
+                    {{ paper.term.name }}
+                </a>
+            </li>
             <li class="breadcrumb-item active fw-bold text-slate-600">{{ paper.subject.name }}</li>
         </ol>
     </nav>
 
-    <div class="row g-5">
-        <!-- Paper Info -->
-        <div class="col-lg-8 animate__animated animate__fadeInLeft">
-            <div class="modern-card p-4 p-md-5">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="badge bg-primary-soft text-primary rounded-pill px-3">{{ paper.get_exam_type_display }}</span>
-                    <span class="badge bg-slate-100 text-slate-600 rounded-pill px-3">{{ paper.year }}</span>
+    <div class="row g-5 flex-column flex-lg-row">
+
+        <!-- Purchase Column -->
+        <div class="col-lg-4 animate__animated animate__fadeInLeft">
+            <div class="sticky-top" style="top: 100px;">
+
+                <div class="modern-card purchase-column p-4 shadow-lg rounded-5 mb-4">
+
+                    <h5 class="fw-bold mb-4 text-primary d-flex align-items-center">
+                        <span class="icon-box-sm bg-primary-gradient text-white me-2">
+                            <i class="fas fa-cart-shopping"></i>
+                        </span>
+                        Purchase Paper
+                    </h5>
+
+                    <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-4 border shadow-sm">
+                        <div class="p-2 rounded-3 bg-slate-50 border">
+                            <i class="fas fa-file-pdf text-danger fa-2x"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="fw-bold small text-slate-800 text-truncate">{{ paper.subject.name }} Exam</div>
+                            <div class="x-small text-slate-500">{{ paper.class_level.name }} • {{ paper.year }}</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <div class="h2 fw-bold text-primary mb-0">GHS {{ paper.price }}</div>
+                        <div class="x-small text-slate-400 text-uppercase tracking-wider">Secure Digital Access</div>
+                    </div>
+
+                    <form action="{% url 'shop:cart_add' paper.id %}" method="post">
+                        {% csrf_token %}
+                        {{ cart_paper_form }}
+                        <button type="submit" class="btn btn-primary-gradient w-100 py-3 fw-bold rounded-pill mb-3 hover-lift">
+                            <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                        </button>
+                    </form>
+
+                    <a href="{% url 'shop:all_papers' %}" class="btn btn-outline-primary w-100 py-3 rounded-pill fw-semibold x-small mb-4 hover-lift">
+                        <i class="fas fa-search me-2"></i> Find More Papers
+                    </a>
+
+                    <div class="pt-3 border-top">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-circle-check text-success x-small"></i>
+                            <span class="x-small text-slate-600">Instant PDF Access</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-circle-check text-success x-small"></i>
+                            <span class="x-small text-slate-600">Secure SMS Password</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-circle-check text-success x-small"></i>
+                            <span class="x-small text-slate-600">Trusted via Paystack</span>
+                        </div>
+                    </div>
+
                 </div>
-                
-                <h1 class="display-6 fw-bold mb-4">{{ paper.title }}</h1>
-                
-                <div class="paper-meta-grid mb-5">
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-4 bg-slate-50 border text-center h-100">
-                                <i class="fas fa-file-pdf text-danger mb-2"></i>
-                                <div class="x-small text-slate-400">Format</div>
-                                <div class="fw-bold small">PDF</div>
-                            </div>
+
+                <!-- Support Card -->
+                <div class="modern-card p-4 bg-primary-gradient text-white rounded-5 shadow-lg">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white-20 rounded-circle p-2">
+                            <i class="fas fa-headset fs-4"></i>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-4 bg-slate-50 border text-center h-100">
-                                <i class="fas fa-file-lines text-primary mb-2"></i>
-                                <div class="x-small text-slate-400">Pages</div>
-                                <div class="fw-bold small">{{ paper.pages }}</div>
-                            </div>
+                        <div>
+                            <div class="fw-bold">Need Assistance?</div>
+                            <div class="small opacity-75">Chat with our experts</div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-4 bg-slate-50 border text-center h-100">
-                                <i class="fas fa-weight-hanging text-info mb-2"></i>
-                                <div class="x-small text-slate-400">Size</div>
-                                <div class="fw-bold small">{{ paper.file_size|default:"1.2 MB" }}</div>
-                            </div>
+                    </div>
+                    <a href="https://wa.me/233542232515" target="_blank"
+                       class="btn btn-white w-100 mt-3 py-2 fw-bold rounded-pill hover-lift">
+                        Message Support
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Paper Details -->
+        <div class="col-lg-8 animate__animated animate__fadeInRight">
+            <div class="modern-card p-4 p-md-5 bg-white rounded-5 shadow-sm">
+
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-primary-soft text-primary rounded-pill px-3">
+                        {{ paper.get_exam_type_display }}
+                    </span>
+                    <span class="badge bg-slate-100 text-slate-600 rounded-pill px-3">
+                        {{ paper.year }}
+                    </span>
+                </div>
+
+                <h1 class="display-6 fw-bold mb-4 text-slate-800">{{ paper.title }}</h1>
+
+                <div class="row g-3 mb-5">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-slate-50 border rounded-4 text-center h-100 hover-bg-white">
+                            <i class="fas fa-file-pdf text-danger fs-4 mb-2"></i>
+                            <div class="x-small text-slate-400">Format</div>
+                            <div class="fw-bold small">PDF</div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-4 bg-slate-50 border text-center h-100">
-                                <i class="fas fa-eye text-success mb-2"></i>
-                                <div class="x-small text-slate-400">Views</div>
-                                <div class="fw-bold small">{{ paper.views }}</div>
-                            </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-slate-50 border rounded-4 text-center h-100 hover-bg-white">
+                            <i class="fas fa-file-lines text-primary fs-4 mb-2"></i>
+                            <div class="x-small text-slate-400">Pages</div>
+                            <div class="fw-bold small">{{ paper.pages }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-slate-50 border rounded-4 text-center h-100 hover-bg-white">
+                            <i class="fas fa-weight-hanging text-info fs-4 mb-2"></i>
+                            <div class="x-small text-slate-400">Size</div>
+                            <div class="fw-bold small">{{ paper.file_size|default:"1.2 MB" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-slate-50 border rounded-4 text-center h-100 hover-bg-white">
+                            <i class="fas fa-eye text-success fs-4 mb-2"></i>
+                            <div class="x-small text-slate-400">Views</div>
+                            <div class="fw-bold small">{{ paper.views }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-5">
                     <h5 class="fw-bold mb-3">Description</h5>
-                    <p class="text-slate-500 lead-sm">
-                        {{ paper.description|default:"This is a verified examination paper for students. It includes comprehensive questions designed to test knowledge and prepare students for their academic assessments." }}
+                    <p class="text-slate-500 lead-sm ps-4 border-start border-3 border-primary">
+                        {{ paper.description|default:"This is a verified examination paper designed to prepare students thoroughly for academic assessments." }}
                     </p>
                 </div>
 
-                <div class="p-4 rounded-5 bg-slate-900 text-white mb-4">
-                    <div class="row align-items-center g-4">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="icon-box-lg bg-white-10">
-                                    <i class="fas fa-shield-halved text-primary"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-bold fs-5">Secure Delivery</div>
-                                    <div class="text-slate-400 small">SMS fulfillment after purchase</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <div class="h2 fw-bold mb-0">GHS {{ paper.price }}</div>
-                            <div class="text-slate-400 x-small text-uppercase tracking-wider">One-time payment</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Checkout Sidebar -->
-        <div class="col-lg-4 animate__animated animate__fadeInRight">
-            <div class="sticky-top" style="top: 100px;">
-                <div class="modern-card p-4">
-                    <h5 class="fw-bold mb-4">Purchase Paper</h5>
-                    
-                    <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-slate-50 rounded-4 border border-dashed">
-                        <div class="p-2 rounded-3 bg-white shadow-sm">
-                            <i class="fas fa-file-pdf text-danger fa-2x"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="fw-bold text-truncate">{{ paper.subject.name }} Exam</div>
-                            <div class="x-small text-slate-400">{{ paper.class_level.name }} • {{ paper.year }}</div>
-                        </div>
-                    </div>
-
-                    <form action="{% url 'shop:cart_add' paper.id %}" method="post">
-                        {% csrf_token %}
-                        {{ cart_paper_form }}
-                        <button type="submit" class="btn btn-primary-gradient w-100 py-3 mb-3">
-                            <i class="fas fa-cart-plus me-2"></i> Add to Cart
-                        </button>
-                    </form>
-                    
-                    <a href="{% url 'shop:all_papers' %}" class="btn btn-light w-100 py-3 border">
-                        <i class="fas fa-search me-2"></i> Find More
-                    </a>
-
-                    <div class="mt-4 pt-4 border-top">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="fas fa-circle-check text-success small"></i>
-                            <span class="small text-slate-600">Instant PDF Download</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="fas fa-circle-check text-success small"></i>
-                            <span class="small text-slate-600">SMS Password Delivery</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-circle-check text-success small"></i>
-                            <span class="small text-slate-600">Secure Payment via Paystack</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Support Card -->
-                <div class="modern-card mt-4 p-4 bg-primary-gradient text-white border-0">
+                <!-- Security Banner -->
+                <div class="security-banner p-4 rounded-5">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="bg-white-20 rounded-circle p-2">
-                            <i class="fas fa-headset fs-4"></i>
+                        <div class="icon-box-lg">
+                            <i class="fas fa-shield-halved"></i>
                         </div>
                         <div>
-                            <div class="fw-bold">Need Help?</div>
-                            <div class="small opacity-75">Chat with us on WhatsApp</div>
+                            <div class="fw-bold fs-5 text-slate-800">Verified Secure</div>
+                            <div class="small text-primary fw-semibold">InsiightPrep Protection</div>
                         </div>
                     </div>
-                    <a href="https://wa.me/233542232515" class="btn btn-white w-100 mt-3 py-2 fw-bold">
-                        Message Support
-                    </a>
                 </div>
+
             </div>
         </div>
+
     </div>
 </div>
 
 <style>
-    .paper-meta-grid .fas { font-size: 1.25rem; }
+    .icon-box-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .icon-box-lg {
         width: 56px;
         height: 56px;
         border-radius: 1rem;
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
     }
-    .bg-white-10 { background: rgba(255, 255, 255, 0.1); }
-    .bg-white-20 { background: rgba(255, 255, 255, 0.2); }
-    .lead-sm { font-size: 1.1rem; line-height: 1.7; }
+
+    .purchase-column {
+        background: linear-gradient(180deg, #f4f7ff, #ffffff);
+        border-left: 4px solid #6366f1;
+    }
+
+    .purchase-column:hover {
+        box-shadow: 0 12px 25px rgba(99,102,241,0.25);
+    }
+
+    .bg-primary-soft {
+        background: rgba(99,102,241,0.1);
+    }
+
+    .bg-white-20 {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary-gradient:hover {
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+    }
+
+    .btn-outline-primary {
+        border-color: #6366f1;
+        color: #6366f1;
+    }
+
+    .btn-outline-primary:hover {
+        background: #6366f1;
+        color: white;
+    }
+
     .btn-white {
         background: white;
         color: #6366f1;
-        border: none;
     }
+
     .btn-white:hover {
         background: #f8fafc;
-        transform: translateY(-2px);
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-3px);
+    }
+
+    .hover-bg-white:hover {
+        background: white;
+        border-color: #6366f1;
+    }
+
+    .security-banner {
+        background: linear-gradient(135deg, #f8faff, #eef2ff);
+        border: 1px solid rgba(99,102,241,0.15);
+    }
+
+    .lead-sm {
+        font-size: 1.05rem;
     }
 </style>
+
 {% endblock %}

@@ -30,9 +30,10 @@
         :root {
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
-            --glass-bg: rgba(255, 255, 255, 0.95);
             --dark-bg: #0f172a;
             --accent-color: #f43f5e;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
         body {
@@ -47,18 +48,20 @@
         
         .main-content {
             flex: 1;
-            padding-bottom: 3rem;
+            padding-bottom: 2rem;
         }
         
-        /* Fixed Header Styling */
+        /* Unified Header & Footer Color */
+        .header-wrapper, .footer {
+            background-color: var(--dark-bg) !important;
+        }
+
         .header-wrapper {
             position: sticky;
             top: 0;
             z-index: 1030;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
         
         .navbar-brand {
@@ -72,7 +75,7 @@
         
         .nav-link {
             font-weight: 500;
-            color: #64748b !important;
+            color: #94a3b8 !important;
             padding: 0.4rem 0.7rem !important;
             border-radius: 0.5rem;
             transition: all 0.2s ease;
@@ -81,11 +84,11 @@
         }
         
         .nav-link:hover, .nav-link.active {
-            color: #6366f1 !important;
-            background: rgba(99, 102, 241, 0.08);
+            color: white !important;
+            background: rgba(255, 255, 255, 0.05);
         }
         
-        /* Icons */
+        /* Header Icon Buttons */
         .header-icon-btn {
             width: 36px;
             height: 36px;
@@ -93,16 +96,29 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: #f1f5f9;
-            color: #6366f1;
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             transition: all 0.2s ease;
             text-decoration: none;
         }
 
+        /* Cart Icon Specific: White Background as requested */
+        .header-icon-btn.cart-icon-main {
+            background: #ffffff !important;
+            color: var(--dark-bg) !important;
+            border: none;
+        }
+
         .header-icon-btn:hover {
-            background: #e2e8f0;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .header-icon-btn.cart-icon-main:hover {
+            background: #f1f5f9 !important;
+            transform: translateY(-2px);
         }
 
         .cart-badge {
@@ -143,27 +159,88 @@
         /* Scrollable Navigation Row */
         .nav-scroll-container {
             overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             display: flex;
             padding: 0.25rem 0 0.5rem;
         }
         .nav-scroll-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
+            display: none;
         }
 
-        .modern-card {
-            background: white;
-            border-radius: 1.25rem;
-            border: 1px solid #e2e8f0;
-            padding: 1.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        /* Drawer / Offcanvas Styling */
+        .offcanvas {
+            background-color: var(--dark-bg);
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .offcanvas-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .offcanvas .nav-link {
+            padding: 1rem 1.5rem !important;
+            border-radius: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 1rem;
         }
 
-        /* Responsive spacing */
+        /* COMPACT FOOTER STYLES */
+        .footer {
+            color: #94a3b8;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 2.5rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .footer h5 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .footer-brand {
+            font-weight: 700;
+            font-size: 1.35rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .footer-link:hover {
+            color: white;
+            padding-left: 4px;
+        }
+        
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .social-btn:hover {
+            background: var(--primary-gradient);
+            transform: translateY(-2px);
+            color: white;
+        }
+
         @media (min-width: 992px) {
             .navbar-brand { font-size: 1.4rem; }
             .nav-link { font-size: 0.9rem; padding: 0.5rem 1rem !important; }
@@ -178,21 +255,26 @@
     <!-- Unified Modern Header -->
     <header class="header-wrapper">
         <div class="container">
-            <!-- Top Row: Brand & Profile/Cart -->
+            <!-- Top Row: Drawer Toggle, Brand & Profile/Cart -->
             <div class="d-flex align-items-center justify-content-between py-2">
-                <a class="navbar-brand d-flex align-items-center" href="{% url 'shop:class_list' %}">
-                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
-                    InsiightPrep
-                </a>
+                <div class="d-flex align-items-center">
+                    <!-- Drawer Toggle Button -->
+                    <button class="btn p-0 me-3 text-white border-0 shadow-none d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#siteDrawer">
+                        <i class="fas fa-bars-staggered fs-4"></i>
+                    </button>
+                    <a class="navbar-brand d-flex align-items-center" href="{% url 'shop:class_list' %}">
+                        <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                        InsiightPrep
+                    </a>
+                </div>
                 
                 <div class="d-flex align-items-center gap-2">
-                    <!-- Global Search Button (Mobile can use this) -->
-                    <a href="{% url 'shop:search_papers' %}" class="header-icon-btn d-lg-none">
+                    <a href="{% url 'shop:search_papers' %}" class="header-icon-btn">
                         <i class="fas fa-search"></i>
                     </a>
 
-                    <!-- Cart Icon -->
-                    <a href="{% url 'shop:cart_detail' %}" class="header-icon-btn">
+                    <!-- Cart Icon with White Background -->
+                    <a href="{% url 'shop:cart_detail' %}" class="header-icon-btn cart-icon-main">
                         <i class="fas fa-shopping-cart"></i>
                         {% with total_items=cart|length %}
                             {% if total_items > 0 %}
@@ -204,24 +286,24 @@
                     <!-- User Dropdown -->
                     {% if user.is_authenticated %}
                         <div class="dropdown">
-                            <button class="header-icon-btn p-0 overflow-hidden" type="button" data-bs-toggle="dropdown" style="border: 2px solid #6366f1;">
+                            <button class="header-icon-btn p-0 overflow-hidden" type="button" data-bs-toggle="dropdown" style="border: 2px solid #6366f1; background: transparent !important;">
                                 {% if user.profile.profile_picture %}
                                     <img src="{{ user.profile.profile_picture.url }}" class="w-100 h-100 object-fit-cover" alt="U">
                                 {% else %}
                                     <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff" class="w-100 h-100" alt="U">
                                 {% endif %}
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 animate__animated animate__fadeInUp">
-                                <li class="px-3 py-2 border-bottom">
-                                    <span class="d-block fw-bold text-dark text-truncate" style="max-width: 150px;">{{ user.username }}</span>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 animate__animated animate__fadeInUp bg-dark">
+                                <li class="px-3 py-2 border-bottom border-secondary">
+                                    <span class="d-block fw-bold text-white text-truncate" style="max-width: 150px;">{{ user.username }}</span>
                                     <small class="text-muted small">{{ user.email|truncatechars:20 }}</small>
                                 </li>
-                                <li><a class="dropdown-item py-2" href="{% url 'shop:profile' %}"><i class="fas fa-id-card me-2 text-primary"></i> Profile</a></li>
-                                <li><a class="dropdown-item py-2" href="{% url 'shop:purchase_history' %}"><i class="fas fa-history me-2 text-primary"></i> History</a></li>
+                                <li><a class="dropdown-item py-2 text-white-50" href="{% url 'shop:profile' %}"><i class="fas fa-id-card me-2 text-primary"></i> Profile</a></li>
+                                <li><a class="dropdown-item py-2 text-white-50" href="{% url 'shop:purchase_history' %}"><i class="fas fa-history me-2 text-primary"></i> History</a></li>
                                 {% if user.is_staff %}
-                                    <li><a class="dropdown-item py-2" href="{% url 'admin:index' %}"><i class="fas fa-user-shield me-2 text-warning"></i> Admin</a></li>
+                                    <li><a class="dropdown-item py-2 text-white-50" href="{% url 'admin:index' %}"><i class="fas fa-user-shield me-2 text-warning"></i> Admin</a></li>
                                 {% endif %}
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider border-secondary"></li>
                                 <li><a class="dropdown-item py-2 text-danger" href="{% url 'shop:logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                             </ul>
                         </div>
@@ -233,9 +315,9 @@
                 </div>
             </div>
 
-            <!-- Bottom Row: Persistent Nav Links (Always visible, scrollable if narrow) -->
+            <!-- Bottom Row: Navigation Links (Scrollable on Phone) -->
             <div class="nav-scroll-container">
-                <nav class="nav">
+                <nav class="nav d-flex flex-nowrap align-items-center">
                     <a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" href="{% url 'shop:class_list' %}">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
@@ -253,7 +335,39 @@
         </div>
     </header>
 
-    <!-- Floating Cart Button (Persistent) -->
+    <!-- Side Menu Drawer (Offcanvas) -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="siteDrawer" aria-labelledby="siteDrawerLabel">
+        <div class="offcanvas-header p-4">
+            <h5 class="offcanvas-title text-white fw-bold" id="siteDrawerLabel">Menu</h5>
+            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="nav flex-column mt-3">
+                <a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" href="{% url 'shop:class_list' %}">
+                    <i class="fas fa-home me-3"></i> Home
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'all_papers' %}active{% endif %}" href="{% url 'shop:all_papers' %}">
+                    <i class="fas fa-file-alt me-3"></i> Browse Papers
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}" href="{% url 'shop:contact_us' %}">
+                    <i class="fas fa-envelope me-3"></i> Contact
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'shop:faq' %}">
+                    <i class="fas fa-question-circle me-3"></i> FAQ
+                </a>
+                <hr class="mx-4 text-white-50 my-3">
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'shop:profile' %}"><i class="fas fa-id-card me-3"></i> Profile</a>
+                    <a class="nav-link" href="{% url 'shop:purchase_history' %}"><i class="fas fa-history me-3"></i> History</a>
+                    <a class="nav-link text-danger" href="{% url 'shop:logout' %}"><i class="fas fa-sign-out-alt me-3"></i> Logout</a>
+                {% else %}
+                    <a class="nav-link text-primary" href="{% url 'shop:login' %}"><i class="fas fa-sign-in-alt me-3"></i> Login / Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+
+    <!-- Floating Cart Button -->
     {% with total_items=cart|length %}
         <a href="{% url 'shop:cart_detail' %}" class="floating-cart animate__animated {% if total_items > 0 %}animate__bounceInRight{% else %}d-none{% endif %}" id="floatingCart">
             <i class="fas fa-shopping-cart"></i>
@@ -265,49 +379,63 @@
         </a>
     {% endwith %}
 
-    <!-- Messages / Alerts -->
+    <!-- Messages -->
     {% if messages %}
         <div class="container mt-3 animate__animated animate__fadeInDown">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
-                    <div class="d-flex align-items-center">
-                        {% if message.tags == 'success' %}
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                        {% elif message.tags == 'error' %}
-                            <i class="fas fa-exclamation-circle me-2 text-danger"></i>
-                        {% endif %}
-                        <div class="small">{{ message }}</div>
-                    </div>
+                    <div class="small">{{ message }}</div>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" style="padding: 0.75rem;"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <!-- Main Content -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Simple Modern Footer -->
-    <footer class="bg-white border-top py-5">
-        <div class="container text-center">
-            <div class="navbar-brand mb-3 d-inline-block">InsiightPrep</div>
-            <p class="text-slate-500 small mb-4">Empowering students with quality educational resources.</p>
-            
-            <div class="d-flex justify-content-center gap-3 mb-4">
-                <a href="https://wa.me/233542232515" class="header-icon-btn"><i class="fab fa-whatsapp"></i></a>
-                <a href="https://x.com/DarkoSamuel15" class="header-icon-btn"><i class="fab fa-x-twitter"></i></a>
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4 text-center text-lg-start">
+                    <a class="footer-brand d-block mb-4 h3 text-decoration-none fw-bold" href="#">InsiightPrep</a>
+                    <p class="mb-4 text-slate-400">Empowering students with premium educational resources. Secure, fast, and reliable access to examination papers.</p>
+                    <div class="d-flex justify-content-center justify-content-lg-start">
+                        <a href="https://wa.me/233542232515" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://x.com/DarkoSamuel15" class="social-btn"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-6 col-lg-2 ms-lg-auto">
+                    <h5>Resources</h5>
+                    <nav class="footer-nav">
+                        <a href="{% url 'shop:all_papers' %}" class="footer-link">All Papers</a>
+                        <a href="{% url 'shop:faq' %}" class="footer-link">FAQs</a>
+                        <a href="{% url 'shop:about' %}" class="footer-link">About Us</a>
+                        <a href="{% url 'shop:contact_us' %}" class="footer-link">Support</a>
+                    </nav>
+                </div>
+                
+                <div class="col-6 col-lg-2">
+                    <h5>Legal</h5>
+                    <nav class="footer-nav">
+                        <a href="{% url 'shop:privacy_policy' %}" class="footer-link">Privacy Policy</a>
+                        <a href="{% url 'shop:terms_of_service' %}" class="footer-link">Terms of Service</a>
+                    </nav>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h5>Contact</h5>
+                    <p class="text-slate-400 mb-2 small"><i class="fas fa-envelope me-2 text-primary"></i> darkosammy2@gmail.com</p>
+                    <p class="text-slate-400 mb-2 small"><i class="fas fa-phone me-2 text-primary"></i> +233 542 232 515</p>
+                    <p class="text-slate-400 small"><i class="fas fa-location-dot me-2 text-primary"></i> Accra, Ghana</p>
+                </div>
             </div>
             
-            <div class="d-flex flex-wrap justify-content-center gap-3 small mb-4">
-                <a href="{% url 'shop:all_papers' %}" class="text-decoration-none text-slate-600">All Papers</a>
-                <a href="{% url 'shop:faq' %}" class="text-decoration-none text-slate-600">FAQ</a>
-                <a href="{% url 'shop:privacy_policy' %}" class="text-decoration-none text-slate-600">Privacy</a>
-                <a href="{% url 'shop:terms_of_service' %}" class="text-decoration-none text-slate-600">Terms</a>
+            <div class="border-top border-secondary mt-5 pt-4 text-center">
+                <p class="mb-0 x-small text-slate-500">&copy; {% now "Y" %} InsiightPrep. All Rights Reserved.</p>
             </div>
-            
-            <p class="mb-0 x-small text-slate-400">&copy; {% now "Y" %} InsiightPrep. All Rights Reserved.</p>
         </div>
     </footer>
 
