@@ -55,7 +55,7 @@ def send_sms_fulfillment(payment):
         return False
 
     question_paper = payment.question_paper
-    message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!" 
+    message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from InsiightPrep! Hope to see you back soon."
     
     # Normalize the recipient phone number to E.164
     to_phone = format_ghana_phone(payment.phone_number)
