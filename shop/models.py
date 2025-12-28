@@ -6,6 +6,11 @@ from django.utils import timezone
 from django.utils.text import slugify
 import uuid
 
+import datetime  # Add this import
+
+def get_current_year():
+    return datetime.date.today().year
+    
 # --- 1. Class (Grade) Model ---
 class Classes(models.Model):
     name = models.CharField(max_length=100, help_text="e.g., JHS 1, Basic 7")
@@ -88,7 +93,7 @@ class QuestionPaper(models.Model):
         choices=[
             ('midterm', 'Mid-Term Exam'),
             ('endterm', 'End-Term Exam'),
-            ('ct', 'Class Test'),
+            ('cat', 'CAT (Continuous Assessment Test)'),
             ('assignment', 'Assignment'),
             ('final', 'Final Exam'),
             ('mock', 'Mock Exam'),
@@ -348,6 +353,7 @@ class FreeSample(models.Model):
             self.sample_pdf.delete(save=False)
         
         super().delete(*args, **kwargs)
+    # --- END CRITICAL FIX ---
     
     class Meta:
         ordering = ('-created_at',)

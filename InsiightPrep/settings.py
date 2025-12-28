@@ -27,11 +27,11 @@ for host in additional_hosts:
         ALLOWED_HOSTS.append(host)
 
 # ====================================================================
-# API KEYS (No change)
+# API KEYS
 # ====================================================================
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
 PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='')
-ARKESEL_API_KEY = config('ARKESEL_API_KEY', default='')
+HTTPSMS_API_KEY = config('HTTPSMS_API_KEY', default='')
 CURRENCY_CODE = config('CURRENCY_CODE', default='GHS')
 
 # ====================================================================

@@ -391,14 +391,14 @@ def payment_callback(request):
     return render(request, 'shop/callback_success.html', context)
 
 # ====================================================================
-# 6. PAYSTACK WEBHOOK HANDLER
+# 6. PAYSTACK WEBHOOK HANDLER (UPDATED FOR HTTPSMS)
 # ====================================================================
 
 @csrf_exempt
 def paystack_webhook(request):
     """
     Handles POST requests from Paystack, verifies the payment, marks it as verified, 
-    and triggers the SMS with the password.
+    and triggers the SMS with the password using HTTPSMS.
     """
     if request.method != 'POST':
         return HttpResponse(status=400)
@@ -441,18 +441,21 @@ def paystack_webhook(request):
                 # Compose the SMS message
                 message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!" 
                 
-                # Arkesel API Details
-                arkesel_url = "https://sms.arkesel.com/api/v2/sms/send"
-                arkesel_payload = {
-                    "sender": "Insight Innovations", 
-                    "message": message,
-                    "recipients": [payment.phone_number],
-                    "apiKey": settings.ARKESEL_API_KEY
+                # HTTPSMS API Details
+                httpsms_url = "https://api.httpsms.com/v1/messages/send"
+                httpsms_headers = {
+                    "x-api-key": settings.HTTPSMS_API_KEY,
+                    "Content-Type": "application/json"
+                }
+                httpsms_payload = {
+                    "content": message,
+                    "to": payment.phone_number,
+                    "from": "+233542232515" # Replace with your verified HTTPSMS sender ID or number if required
                 }
 
                 try:
-                    # Send the SMS via Arkesel
-                    requests.post(arkesel_url, json=arkesel_payload)
+                    # Send the SMS via HTTPSMS
+                    requests.post(httpsms_url, headers=httpsms_headers, json=httpsms_payload)
                 except Exception as e:
                     # Log SMS error but don't fail the webhook
                     print(f"Error sending SMS: {e}")
@@ -501,7 +504,7 @@ def track_download_api(request, paper_slug):
 @csrf_exempt
 def resend_password_api(request, payment_ref):
     """
-    API endpoint to resend password SMS.
+    API endpoint to resend password SMS using HTTPSMS.
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -513,20 +516,24 @@ def resend_password_api(request, payment_ref):
         # Compose the SMS message
         message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!"
         
-        # Arkesel API Details
-        arkesel_url = "https://sms.arkesel.com/api/v2/sms/send"
-        arkesel_payload = {
-            "sender": "Insight Innovations", 
-            "message": message,
-            "recipients": [payment.phone_number],
-            "apiKey": settings.ARKESEL_API_KEY
+        # HTTPSMS API Details
+        httpsms_url = "https://api.httpsms.com/v1/messages/send"
+        httpsms_headers = {
+            "x-api-key": settings.HTTPSMS_API_KEY,
+            "Content-Type": "application/json"
+        }
+        httpsms_payload = {
+            "content": message,
+            "to": payment.phone_number,
+            "from": "+233542232515" # Replace with your verified HTTPSMS sender ID or number
         }
         
-        response = requests.post(arkesel_url, json=arkesel_payload)
+        response = requests.post(httpsms_url, headers=httpsms_headers, json=httpsms_payload)
         
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             return JsonResponse({'success': True, 'message': 'Password resent'})
         else:
+            print(f"HTTPSMS Error: {response.text}")
             return JsonResponse({'error': 'Failed to send SMS'}, status=500)
             
     except Exception as e:
