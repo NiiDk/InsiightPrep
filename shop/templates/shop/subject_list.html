@@ -1,371 +1,246 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ term.name }} Subjects | InsiightPrep{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Classes</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' class_level.slug %}">{{ class_level.name }}</a></li>
-            <li class="breadcrumb-item active">{{ term.name }} Subjects</li>
+<div class="container py-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4 animate__animated animate__fadeIn">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm border">
+            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}" class="text-decoration-none text-primary fw-medium">Grades</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:term_list' class_level.slug %}" class="text-decoration-none text-primary fw-medium">{{ class_level.name }}</a></li>
+            <li class="breadcrumb-item active fw-bold text-slate-600">{{ term.name }}</li>
         </ol>
     </nav>
-    
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-header bg-gradient-teal text-white">
-            <div class="d-flex flex-wrap justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-1">
-                        <i class="bi bi-mortarboard me-2"></i>{{ class_level.name }}
-                    </h1>
-                    <p class="mb-0">
-                        <i class="bi bi-calendar-week"></i> {{ term.name }} - Available Subjects
-                    </p>
-                </div>
-                <div class="text-end mt-2 mt-md-0">
-                    <div class="d-flex flex-wrap align-items-center gap-3">
-                        <span class="badge bg-light text-dark fs-6 p-2">
-                            <i class="bi bi-journals me-1"></i> {{ subjects_list|length }} Subjects
-                        </span>
-                        <span class="badge bg-light text-dark fs-6 p-2">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> {{ total_papers }} Papers
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-body bg-faded-black text-white">
-            <p class="lead mb-0">
-                Select a subject to browse all available question papers for {{ term.name }}.
-            </p>
-        </div>
-    </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="subjectSearch" placeholder="Search subjects by name...">
-            </div>
-        </div>
-        <div class="col-md-4 mt-2 mt-md-0">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-funnel"></i> Filter by Paper Count
-                </button>
-                <ul class="dropdown-menu w-100">
-                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Subjects</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item filter-option" href="#" data-filter="has-papers">Has Papers</a></li>
-                    <li><a class="dropdown-item filter-option" href="#" data-filter="no-papers">No Papers</a></li>
-                </ul>
+
+    <div class="text-center mb-5 animate__animated animate__fadeInDown">
+        <h1 class="display-5 fw-bold mb-2">
+            <span class="text-amber-gradient">{{ term.name }}</span> Subjects
+        </h1>
+        <p class="text-slate-500 lead mx-auto" style="max-width: 600px;">
+            Choose a subject to explore all available examination papers for {{ class_level.name }}.
+        </p>
+        
+        <!-- Mobile Menu Quick Nav -->
+        <div class="quick-nav-wrapper mt-4">
+            <div class="quick-nav-scroll">
+                <a href="{% url 'shop:class_list' %}" class="quick-nav-pill">
+                    <i class="fas fa-arrow-left me-2"></i> All Grades
+                </a>
+                <a href="{% url 'shop:term_list' class_level.slug %}" class="quick-nav-pill">
+                    <i class="fas fa-calendar-week me-2"></i> All Terms
+                </a>
+                <a href="{% url 'shop:all_papers' %}" class="quick-nav-pill">
+                    <i class="fas fa-file-lines me-2"></i> All Papers
+                </a>
+                <a href="{% url 'shop:contact_us' %}" class="quick-nav-pill">
+                    <i class="fas fa-headset me-2"></i> Support
+                </a>
             </div>
         </div>
     </div>
-    
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="subjectsGrid">
+
+    <!-- Search & Filter -->
+    <div class="row justify-content-center mb-5 animate__animated animate__fadeIn">
+        <div class="col-lg-6">
+            <div class="search-container shadow-sm border bg-white rounded-pill p-1">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-0 ps-3">
+                        <i class="fas fa-search text-slate-400"></i>
+                    </span>
+                    <input type="text" id="subjectSearch" class="form-control border-0 shadow-none" placeholder="Search subjects (e.g. Mathematics, Science)...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center" id="subjectsGrid">
         {% for item in subjects_list %}
-            <div class="col subject-item" data-name="{{ item.subject.name|lower }}" data-papers="{{ item.papers|length }}">
-                <div class="card h-100 shadow-sm border-0 hover-lift">
-                    <div class="card-body text-center p-4">
-                        <div class="subject-icon mb-3">
-                            <div class="icon-circle {% if item.papers|length > 0 %}bg-info{% else %}bg-secondary{% endif %}">
-                                {% if item.subject.icon %}
-                                    <i class="{{ item.subject.icon }} fa-2x text-white"></i>
-                                {% else %}
-                                    <i class="bi bi-book fa-2x text-white"></i>
-                                {% endif %}
-                            </div>
+            <div class="col subject-item animate__animated animate__fadeInUp" 
+                 data-name="{{ item.subject.name|lower }}"
+                 style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+                
+                <div class="modern-card compact-card h-100 card-amber">
+                    <div class="card-glow-amber"></div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
+                        <div class="icon-box-amber">
+                            <i class="fas fa-book-open"></i>
                         </div>
-                        
-                        <h4 class="card-title text-dark fw-bold mb-2">{{ item.subject.name }}</h4>
-                        
-                        <div class="mb-3">
-                            <span class="badge {% if item.papers|length > 0 %}bg-success{% else %}bg-secondary{% endif %} rounded-pill fs-6 px-3 py-2">
-                                {{ item.papers|length }} Paper{{ item.papers|length|pluralize }}
-                            </span>
-                        </div>
-                        
-                        {% if item.subject.description %}
-                            <p class="card-text text-muted small mb-3">
-                                {{ item.subject.description|truncatewords:20 }}
-                            </p>
-                        {% endif %}
-                        
-                        {% if item.papers|length > 0 %}
-                            <div class="latest-paper mb-3">
-                                <small class="text-muted">
-                                    <i class="bi bi-clock-history me-1"></i>
-                                    Latest: 
-                                    {% with paper=item.papers.0 %}
-                                        {{ paper.year }} {{ paper.get_exam_type_display }}
-                                    {% endwith %}
-                                </small>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="action-buttons">
-                            {% if item.papers|length > 0 %}
-                                {% if item.papers|length == 1 %}
-                                    {% with paper=item.papers.0 %}
-                                        <a href="{% url 'shop:paper_detail' class_level.slug term.slug item.subject.slug paper.slug %}" 
-                                            class="btn btn-info btn-sm w-100">
-                                            <i class="bi bi-eye me-1"></i> View Paper
-                                        </a>
-                                    {% endwith %}
-                                {% else %}
-                                    <a href="{% url 'shop:subject_papers_list' class_level.slug term.slug item.subject.slug %}" 
-                                        class="btn btn-info btn-sm w-100">
-                                        <i class="bi bi-list me-1"></i> Browse {{ item.papers|length }} Papers
-                                    </a>
-                                {% endif %}
-                            {% else %}
-                                <button class="btn btn-outline-secondary btn-sm w-100" disabled>
-                                    <i class="bi bi-hourglass-split me-1"></i> Coming Soon
-                                </button>
-                            {% endif %}
-                        </div>
+                        <span class="paper-badge-amber">
+                            {{ item.papers|length }} papers
+                        </span>
                     </div>
                     
-                    <div class="card-footer bg-transparent text-center pt-3 border-top-0">
-                        <div class="d-flex justify-content-center gap-2">
-                            {% if item.papers|length > 0 %}
-                                {% for paper in item.papers|slice:":3" %}
-                                    <span class="badge bg-light text-dark small">
-                                        {{ paper.exam_type|slice:":3" }}
-                                    </span>
-                                {% endfor %}
-                                {% if item.papers|length > 3 %}
-                                    <span class="badge bg-light text-dark small">
-                                        +{{ item.papers|length|add:"-3" }}
-                                    </span>
-                                {% endif %}
+                    <h5 class="fw-bold text-slate-800 mb-2 group-hover:text-amber transition-colors position-relative">
+                        {{ item.subject.name }}
+                    </h5>
+                    
+                    <p class="text-slate-500 x-small mb-4 flex-grow-1 position-relative">
+                        Explore {{ item.papers|length }} curated examination papers for {{ item.subject.name }} in {{ term.name }}.
+                    </p>
+                    
+                    <div class="position-relative">
+                        {% if item.papers|length > 0 %}
+                            {% if item.papers|length == 1 %}
+                                {% with paper=item.papers.0 %}
+                                    <a href="{% url 'shop:paper_detail' class_level.slug term.slug item.subject.slug paper.slug %}" 
+                                       class="btn btn-amber-gradient w-100 btn-sm rounded-pill py-2">
+                                        View Paper <i class="fas fa-chevron-right ms-1"></i>
+                                    </a>
+                                {% endwith %}
                             {% else %}
-                                <small class="text-muted">Papers in progress</small>
+                                <a href="{% url 'shop:subject_papers_list' class_level.slug term.slug item.subject.slug %}" 
+                                   class="btn btn-amber-gradient w-100 btn-sm rounded-pill py-2">
+                                    Browse Papers <i class="fas fa-list ms-1"></i>
+                                </a>
                             {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-warning text-center py-5">
-                    <div class="py-4">
-                        <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
-                        <h4 class="alert-heading">No Subjects Available</h4>
-                        <p>No subjects have been added for {{ class_level.name }} {{ term.name }} yet.</p>
-                        {% if user.is_staff %}
-                        <a href="{% url 'admin:shop_subject_add' %}" class="btn btn-outline-warning mt-2">
-                            <i class="bi bi-plus-circle me-1"></i> Add Subjects (Admin)
-                        </a>
+                        {% else %}
+                            <button class="btn btn-light w-100 btn-sm rounded-pill py-2 border" disabled>
+                                Coming Soon
+                            </button>
                         {% endif %}
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
-    
-    <div id="noSubjectsFound" class="alert alert-info text-center py-5 d-none">
-        <i class="bi bi-search fa-3x text-info mb-3"></i>
-        <h4>No Subjects Found</h4>
-        <p class="mb-0">Try adjusting your search criteria.</p>
-    </div>
-    
-    <div class="text-center mt-4">
-        <a href="{% url 'shop:term_list' class_level.slug %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back to {{ class_level.name }} Terms
-        </a>
+
+    <!-- Empty State -->
+    <div id="noResults" class="text-center py-5 d-none">
+        <img src="https://illustrations.popsy.co/slate/searching.svg" style="width: 180px;" alt="Not found">
+        <h4 class="mt-4 fw-bold">No subjects found</h4>
+        <p class="text-slate-500">Try a different search term or browse all subjects.</p>
     </div>
 </div>
+
+<style>
+    :root {
+        --amber-primary: #f59e0b;
+        --amber-dark: #d97706;
+        --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .text-amber-gradient {
+        background: var(--amber-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-amber-gradient {
+        background: var(--amber-gradient);
+        color: white;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-amber-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px -3px rgba(245, 158, 11, 0.4);
+        color: white;
+    }
+
+    /* Card Specific Amber Styling */
+    .card-amber {
+        border-left: 4px solid var(--amber-primary) !important;
+        background: #ffffff !important;
+    }
+    .card-amber:hover {
+        border-color: var(--amber-dark) !important;
+        background: #fffcf2 !important; /* Amber 50-like */
+    }
+    .icon-box-amber {
+        width: 42px;
+        height: 42px;
+        background: var(--amber-gradient);
+        color: white;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    }
+    .paper-badge-amber {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--amber-dark);
+        background: #fef3c7; /* Amber 100 */
+        padding: 0.3rem 0.75rem;
+        border-radius: 2rem;
+        text-transform: uppercase;
+    }
+    .card-glow-amber {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08), transparent 70%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .modern-card:hover .card-glow-amber { opacity: 1; }
+
+    .x-small { font-size: 0.8rem; }
+    .compact-card {
+        padding: 1.25rem !important;
+        border-radius: 1rem !important;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Quick Nav */
+    .quick-nav-wrapper { overflow: hidden; margin-bottom: 1rem; }
+    .quick-nav-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+    .quick-nav-pill {
+        display: inline-flex; align-items: center; padding: 0.5rem 1.25rem; background: white;
+        border: 1px solid #e2e8f0; border-radius: 2rem; color: #64748b; text-decoration: none;
+        font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;
+    }
+    .quick-nav-pill:hover { background: #f8fafc; border-color: var(--amber-primary); color: var(--amber-dark); transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+        .quick-nav-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+        .quick-nav-scroll::-webkit-scrollbar { display: none; }
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('subjectSearch');
-    const subjectsGrid = document.getElementById('subjectsGrid');
-    const noResults = document.getElementById('noSubjectsFound');
-    const subjectItems = subjectsGrid ? subjectsGrid.querySelectorAll('.subject-item') : [];
-    
-    // Search functionality
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            let visibleCount = 0;
-            
-            subjectItems.forEach(item => {
-                const subjectName = item.getAttribute('data-name');
-                const hasPapers = item.getAttribute('data-papers') !== '0';
-                
-                if (subjectName.includes(searchTerm)) {
-                    item.style.display = 'block';
-                    visibleCount++;
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('subjectSearch');
+        const subjectsGrid = document.getElementById('subjectsGrid');
+        const noResults = document.getElementById('noResults');
+        const subjectItems = document.querySelectorAll('.subject-item');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase().trim();
+                let hasVisible = false;
+
+                subjectItems.forEach(item => {
+                    const name = item.getAttribute('data-name');
+                    if (name.includes(term)) {
+                        item.style.display = 'block';
+                        hasVisible = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                if (hasVisible) {
+                    noResults.classList.add('d-none');
+                    subjectsGrid.classList.remove('d-none');
                 } else {
-                    item.style.display = 'none';
+                    noResults.classList.remove('d-none');
+                    subjectsGrid.classList.add('d-none');
                 }
-            });
-            
-            // Show/hide no results message
-            if (visibleCount === 0 && searchTerm !== '') {
-                noResults.classList.remove('d-none');
-                subjectsGrid.classList.add('d-none');
-            } else {
-                noResults.classList.add('d-none');
-                subjectsGrid.classList.remove('d-none');
-            }
-        });
-    }
-    
-    // Filter functionality
-    document.querySelectorAll('.filter-option').forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.preventDefault();
-            const filterType = this.getAttribute('data-filter');
-            let visibleCount = 0;
-            
-            subjectItems.forEach(item => {
-                const hasPapers = item.getAttribute('data-papers') !== '0';
-                
-                if (filterType === 'all' || 
-                    (filterType === 'has-papers' && hasPapers) ||
-                    (filterType === 'no-papers' && !hasPapers)) {
-                    item.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            
-            // Update button text
-            const button = document.querySelector('[data-bs-toggle="dropdown"]');
-            button.innerHTML = `<i class="bi bi-funnel"></i> ${this.textContent}`;
-            
-            // Show/hide no results
-            if (visibleCount === 0) {
-                noResults.classList.remove('d-none');
-                subjectsGrid.classList.add('d-none');
-            } else {
-                noResults.classList.add('d-none');
-                subjectsGrid.classList.remove('d-none');
-            }
-        });
-    });
-    
-    // Add hover effects
-    subjectItems.forEach(item => {
-        const card = item.querySelector('.card');
-        if (card) {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px)';
-                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '';
             });
         }
     });
-    
-    // Add animation to icons
-    const icons = document.querySelectorAll('.subject-icon .icon-circle');
-    icons.forEach((icon, index) => {
-        icon.style.opacity = '0';
-        icon.style.transform = 'scale(0.5)';
-        
-        setTimeout(() => {
-            icon.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            icon.style.opacity = '1';
-            icon.style.transform = 'scale(1)';
-        }, 100 * index);
-    });
-});
 </script>
-
-<style>
-/* --- NEW CUSTOM STYLES FOR TEAL/FADED BLACK THEME --- */
-.bg-gradient-teal {
-    /* Teal/Cyan gradient for the header */
-    background-color: #20c997 !important; /* Standard teal color fallback */
-    background-image: linear-gradient(135deg, #1abc9c 0%, #17a2b8 100%) !important; /* Teal to Cyan */
-}
-
-.bg-faded-black {
-    /* A deep faded black (dark grey) for the card body */
-    background-color: #343a40 !important; /* Bootstrap 'dark' color */
-}
-
-/* Ensure text on faded black background is white */
-.bg-faded-black.text-white {
-    color: #ffffff !important;
-}
-
-/* Adjust badges inside the new dark/teal header for better contrast */
-.card-header.bg-gradient-teal .badge.bg-light {
-    background-color: rgba(255, 255, 255, 0.8) !important; /* Slightly transparent white for contrast */
-    color: #212529 !important; /* Dark text on light badge */
-}
-/* --------------------------------------------------- */
-
-.hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.subject-icon {
-    position: relative;
-}
-
-.icon-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.latest-paper {
-    background: #f8f9fa;
-    padding: 8px;
-    border-radius: 6px;
-    border-left: 3px solid #198754;
-}
-
-.action-buttons .btn {
-    transition: all 0.3s ease;
-}
-
-.action-buttons .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.badge.rounded-pill {
-    font-weight: 500;
-}
-
-.card-footer .badge {
-    font-size: 0.7rem;
-    padding: 4px 8px;
-}
-
-@media (max-width: 768px) {
-    .icon-circle {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .icon-circle i {
-        font-size: 1.5rem !important;
-    }
-    
-    .card-title {
-        font-size: 1.1rem;
-    }
-}
-</style>
 {% endblock %}

@@ -1,214 +1,170 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_title %}Terms for {{ class_level.name }}{% endblock page_title %}
+{% block page_title %}Terms for {{ class_level.name }} | InsiightPrep{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}">Classes</a></li>
-            <li class="breadcrumb-item active">{{ class_level.name }}</li>
+<div class="container py-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4 animate__animated animate__fadeIn">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm border">
+            <li class="breadcrumb-item"><a href="{% url 'shop:class_list' %}" class="text-decoration-none text-indigo fw-medium">Grades</a></li>
+            <li class="breadcrumb-item active fw-bold text-slate-600">{{ class_level.name }}</li>
         </ol>
     </nav>
     
-    <div class="text-center mb-5">
-        <h1 class="text-primary fw-bold">
-            <i class="bi bi-calendar-week me-2"></i>{{ class_level.name }} Terms
+    <div class="text-center mb-5 animate__animated animate__fadeInDown">
+        <h1 class="display-5 fw-bold mb-2">
+            <span class="text-indigo-gradient">{{ class_level.name }}</span> Terms
         </h1>
-        <p class="lead text-muted">
-            Select a term to browse available subjects and question papers
+        <p class="text-slate-500 lead mx-auto" style="max-width: 600px;">
+            Select a specific academic term to access all relevant subjects and examination papers.
         </p>
+        
+        <!-- Mobile Menu Quick Nav -->
+        <div class="quick-nav-wrapper mt-4">
+            <div class="quick-nav-scroll">
+                <a href="{% url 'shop:class_list' %}" class="quick-nav-pill">
+                    <i class="fas fa-home me-2"></i> Home
+                </a>
+                <a href="{% url 'shop:all_papers' %}" class="quick-nav-pill">
+                    <i class="fas fa-file-lines me-2"></i> All Papers
+                </a>
+                <a href="{% url 'shop:faq' %}" class="quick-nav-pill">
+                    <i class="fas fa-circle-question me-2"></i> FAQ
+                </a>
+                <a href="{% url 'shop:contact_us' %}" class="quick-nav-pill">
+                    <i class="fas fa-headset me-2"></i> Support
+                </a>
+            </div>
+        </div>
     </div>
     
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="row g-4 mb-5 row-cols-1 row-cols-md-2 row-cols-xl-3 justify-content-center">
         {% for term_obj in terms %}
-            <div class="col">
-                <a href="{% url 'shop:subject_list' class_level.slug term_obj.slug %}" class="text-decoration-none">
-                    <div class="card h-100 shadow border-0 hover-lift">
-                        <div class="card-header bg-teal-gradient text-white text-center py-4">
-                            <div class="term-icon mb-3">
-                                <i class="bi bi-journal-text" style="font-size: 3rem;"></i>
+            <div class="col animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+                <a href="{% url 'shop:subject_list' class_level.slug term_obj.slug %}" class="text-decoration-none group">
+                    <div class="modern-card card-indigo compact-card h-100">
+                        <div class="card-glow-indigo"></div>
+                        <div class="d-flex align-items-center justify-content-between mb-4 position-relative">
+                            <div class="term-icon-box-indigo">
+                                <i class="fas fa-calendar-check"></i>
                             </div>
-                            <h3 class="card-title mb-0 fw-bold display-6">{{ term_obj.name }}</h3>
-                        </div>
-                        <div class="card-body p-4 text-center">
-                            <p class="card-text text-muted mb-4">
-                                Access all subjects and question papers for {{ term_obj.name }}
-                            </p>
-                            
-                            <div class="term-stats mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="text-muted">
-                                        <i class="bi bi-file-earmark-pdf"></i> Papers:
-                                    </span>
-                                    <span class="badge bg-primary">
-                                        {{ term_obj.get_paper_count }}
-                                    </span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">
-                                        <i class="bi bi-book"></i> Subjects:
-                                    </span>
-                                    <span class="badge bg-info">
-                                        {{ term_obj.subjects_count|default:"Multiple" }}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div class="quick-info">
-                                <small class="text-muted">
-                                    <i class="bi bi-check-circle text-success"></i> 
-                                    Secure PDF downloads available
-                                </small>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-top-0 text-center py-3">
-                            <span class="btn btn-success px-4">
-                                <i class="bi bi-arrow-right-circle me-2"></i>Browse Subjects
+                            <span class="paper-badge-indigo">
+                                Term {{ forloop.counter }}
                             </span>
+                        </div>
+                        
+                        <h3 class="fw-bold text-slate-800 mb-2 group-hover:text-indigo transition-colors position-relative">
+                            {{ term_obj.name }}
+                        </h3>
+                        
+                        <p class="text-slate-500 small mb-4 flex-grow-1 position-relative">
+                            Browse all subjects and download secured PDF examination papers for {{ term_obj.name }}.
+                        </p>
+                        
+                        <div class="term-meta position-relative">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-slate-400 x-small">Available Papers</span>
+                                <span class="fw-bold text-indigo">{{ term_obj.get_paper_count }}</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: #e0e7ff;">
+                                <div class="progress-bar bg-indigo-gradient" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex align-items-center text-indigo fw-bold position-relative">
+                            View Subjects <i class="fas fa-arrow-right ms-2 fs-xs"></i>
                         </div>
                     </div>
                 </a>
             </div>
         {% empty %}
-            <div class="col-12">
-                <div class="alert alert-warning text-center py-5">
-                    <div class="py-4">
-                        <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
-                        <h4 class="alert-heading">No Terms Available</h4>
-                        <p>No terms have been added for {{ class_level.name }} yet.</p>
-                        {% if user.is_staff %}
-                        <a href="{% url 'admin:shop_term_add' %}" class="btn btn-outline-warning mt-2">
-                            <i class="bi bi-plus-circle me-1"></i> Add Terms (Admin)
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
+            <div class="col-12 text-center py-5">
+                <img src="https://illustrations.popsy.co/slate/empty-folder.svg" style="width: 180px;" alt="Empty">
+                <h4 class="mt-4 fw-bold">No terms found</h4>
+                <p class="text-slate-500">Terms for {{ class_level.name }} are being updated.</p>
             </div>
         {% endfor %}
     </div>
-    
-    <div class="text-center mt-5">
-        <a href="{% url 'shop:class_list' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back to All Classes
-        </a>
-    </div>
-    
-    <div class="row justify-content-center mt-5 pt-4">
-        <div class="col-lg-8">
-            <div class="card bg-light border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h5 class="text-primary mb-3">
-                                <i class="bi bi-info-circle me-2"></i> About {{ class_level.name }} Question Papers
-                            </h5>
-                            <p class="text-muted mb-0">
-                                Each term contains a collection of past papers, assignments, and exams. 
-                                All documents are properly formatted and ready for download.
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <div class="download-info">
-                                <div class="d-flex align-items-center justify-content-md-end gap-2">
-                                    <i class="bi bi-download text-success" style="font-size: 1.5rem;"></i>
-                                    <div>
-                                        <h6 class="mb-0">Instant Access</h6>
-                                        <small class="text-muted">Download immediately</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-{% endblock content %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effects to term cards
-    const termCards = document.querySelectorAll('.card.hover-lift');
-    
-    termCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px)';
-            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '';
-        });
-    });
-    
-    // Add animation to term icons
-    const termIcons = document.querySelectorAll('.term-icon');
-    termIcons.forEach((icon, index) => {
-        icon.style.opacity = '0';
-        icon.style.transform = 'scale(0.8)';
-        
-        setTimeout(() => {
-            icon.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            icon.style.opacity = '1';
-            icon.style.transform = 'scale(1)';
-        }, 100 * index);
-    });
-});
-</script>
 
 <style>
-.hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* ADDED: Custom CSS class for Teal background */
-.bg-teal-gradient {
-    background: #008080; /* Teal primary color */
-    background: linear-gradient(135deg, #008080 0%, #004d4d 100%); /* Teal gradient for depth */
-}
-
-.term-stats {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    /* CHANGED: Updated border color to match the teal theme */
-    border-left: 4px solid #008080; 
-}
-
-.term-icon {
-    transition: transform 0.3s ease;
-}
-
-.card:hover .term-icon {
-    transform: scale(1.1);
-}
-
-.quick-info {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #dee2e6;
-}
-
-.download-info {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-}
-
-@media (max-width: 768px) {
-    .display-6 {
-        font-size: 2rem !important;
+    :root {
+        --indigo-primary: #6366f1;
+        --indigo-dark: #4f46e5;
+        --indigo-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     }
+
+    .text-indigo { color: var(--indigo-dark); }
+    .text-indigo-gradient {
+        background: var(--indigo-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Card Specific Indigo Styling */
+    .card-indigo {
+        border-left: 4px solid var(--indigo-primary) !important;
+        background: #ffffff !important;
+    }
+    .card-indigo:hover {
+        border-color: var(--indigo-dark) !important;
+        background: #f5f7ff !important; /* Indigo 50 */
+    }
+    .term-icon-box-indigo {
+        width: 52px;
+        height: 52px;
+        background: var(--indigo-gradient);
+        color: white;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
+    }
+    .paper-badge-indigo {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--indigo-dark);
+        background: #e0e7ff; /* Indigo 100 */
+        padding: 0.3rem 0.75rem;
+        border-radius: 2rem;
+        text-transform: uppercase;
+    }
+    .card-glow-indigo {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08), transparent 70%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .modern-card:hover .card-glow-indigo { opacity: 1; }
     
-    .card-header {
-        padding: 1.5rem !important;
+    .bg-indigo-gradient { background: var(--indigo-gradient); }
+
+    .x-small { font-size: 0.75rem; }
+    .fs-xs { font-size: 0.7rem; }
+    .compact-card { padding: 1.25rem !important; border-radius: 1rem !important; overflow: hidden; position: relative; }
+
+    /* Quick Nav */
+    .quick-nav-wrapper { overflow: hidden; margin-bottom: 1rem; }
+    .quick-nav-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+    .quick-nav-pill {
+        display: inline-flex; align-items: center; padding: 0.5rem 1.25rem; background: white;
+        border: 1px solid #e2e8f0; border-radius: 2rem; color: #64748b; text-decoration: none;
+        font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;
     }
-}
+    .quick-nav-pill:hover { background: #f8fafc; border-color: var(--indigo-primary); color: var(--indigo-dark); transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+        .quick-nav-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+        .quick-nav-scroll::-webkit-scrollbar { display: none; }
+    }
 </style>
 {% endblock %}

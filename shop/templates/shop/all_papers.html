@@ -1,50 +1,108 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title|default:"Browse All Papers" }} | InsiightPrep{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="mb-4">{{ page_title }} <span class="badge bg-info">{{ total_count }}</span></h1>
-    
-    {% if papers %}
-        <div class="row">
-            {% for paper in papers %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ paper.title|truncatechars:50 }}</h5>
-                        <p class="card-text">
-                            <span class="badge bg-info me-1">{{ paper.class_level.name }}</span>
-                            <span class="badge bg-secondary me-1">{{ paper.term.name }}</span>
-                            <span class="badge bg-primary">{{ paper.subject.name }}</span>
-                        </p>
-                        <p class="text-muted small">{{ paper.description|truncatewords:15 }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                {% if paper.is_paid %}
-                                    <span class="text-success fw-bold">Ksh {{ paper.price }}</span>
-                                {% else %}
-                                    <span class="badge bg-success">FREE</span>
-                                {% endif %}
-                            </div>
-                            <a href="{% url 'shop:paper_detail' paper.class_level.slug paper.term.slug paper.subject.slug paper.slug %}" 
-                               class="btn btn-sm btn-outline-info">View</a>
-                        </div>
-                    </div>
-                    <div class="card-footer text-muted small">
-                        <i class="fas fa-calendar me-1"></i> {{ paper.year }}
-                        <i class="fas fa-eye ms-3 me-1"></i> {{ paper.views|default:0 }} views
-                    </div>
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5 animate__animated animate__fadeIn">
+        <h1 class="display-5 fw-bold mb-2">
+            <span class="text-primary-gradient">Browse</span> All Papers
+        </h1>
+        <p class="text-slate-500">Explore our complete collection of examination papers across all levels.</p>
+        
+        <!-- Search Filter Integration -->
+        <div class="mt-4 mx-auto" style="max-width: 500px;">
+            <form action="{% url 'shop:search_papers' %}" method="GET">
+                <div class="search-container shadow-sm border">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="q" class="form-control search-input" placeholder="Filter by subject or grade..." value="{{ request.GET.q }}">
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
+
+    {% if papers %}
+        <div class="row g-4 mb-5 justify-content-center">
+            {% for paper in papers %}
+                <div class="col-md-6 col-lg-4 col-xl-3 animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+                    <a href="{{ paper.get_absolute_url }}" class="text-decoration-none group">
+                        <div class="modern-card h-100 p-0 overflow-hidden">
+                            <!-- Card Image/Top Decor -->
+                            <div class="p-4 bg-slate-50 text-center border-bottom">
+                                <i class="fas fa-file-pdf text-danger fa-3x mb-3 animate__animated group-hover:animate__pulse"></i>
+                                <div class="badge rounded-pill bg-white text-slate-600 shadow-sm px-3 py-2 border">
+                                    {{ paper.year }} Academic Year
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="p-4">
+                                <div class="d-flex gap-1 mb-2 flex-wrap">
+                                    <span class="badge bg-primary-soft text-primary x-small rounded-pill">{{ paper.class_level.name }}</span>
+                                    <span class="badge bg-teal-soft text-teal x-small rounded-pill">{{ paper.subject.name }}</span>
+                                </div>
+                                
+                                <h6 class="fw-bold text-slate-800 mb-3 group-hover:text-primary transition-colors">
+                                    {{ paper.title|truncatechars:45 }}
+                                </h6>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <div>
+                                        {% if paper.is_paid %}
+                                            <span class="fw-bold text-slate-900">GHS {{ paper.price }}</span>
+                                        {% else %}
+                                            <span class="text-success fw-bold x-small uppercase tracking-wider">Free</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-slate-400 x-small">
+                                        <i class="fas fa-eye me-1"></i> {{ paper.views }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Action -->
+                            <div class="p-3 bg-slate-50 border-top text-center x-small fw-bold text-primary">
+                                View Details <i class="fas fa-chevron-right ms-1"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-warning text-center">
-            <i class="fas fa-file-alt fa-2x mb-3"></i>
-            <h4>No papers available</h4>
-            <p>Check back soon for new papers or browse by <a href="{% url 'shop:class_list' %}">class</a>.</p>
+        <div class="text-center py-5">
+            <img src="https://illustrations.popsy.co/slate/empty-folder.svg" style="width: 200px;" alt="Empty">
+            <h4 class="mt-4 fw-bold">No papers found</h4>
+            <p class="text-slate-500">We couldn't find any papers matching your criteria.</p>
+            <a href="{% url 'shop:class_list' %}" class="btn btn-primary-gradient px-4">Back to Grades</a>
         </div>
     {% endif %}
 </div>
+
+<style>
+    .bg-primary-soft { background: rgba(99, 102, 241, 0.1); }
+    .bg-teal-soft { background: rgba(45, 212, 191, 0.1); }
+    .text-teal { color: #0d9488; }
+    .x-small { font-size: 0.75rem; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    
+    .modern-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 1rem;
+    }
+    
+    .modern-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #6366f1;
+    }
+    
+    .group:hover .group-hover\:text-primary {
+        color: #6366f1 !important;
+    }
+</style>
 {% endblock %}

@@ -5,840 +5,314 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block page_title %}InsiightPrep{% endblock %}</title>
     
-    <!-- Bootstrap 5 CSS -->
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
           rel="stylesheet" 
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
           crossorigin="anonymous">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     
-    <!-- Cloudinary CSS (for image transformations) -->
-    <link rel="stylesheet" href="https://unpkg.com/cloudinary-video-player/dist/cld-video-player.min.css">
-    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --info-color: #0dcaf0;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --dark-bg: #0f172a;
+            --accent-color: #f43f5e;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 76px; /* Account for fixed navbar */
-            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
         
         .main-content {
             flex: 1;
-            padding: 20px 0;
-            min-height: calc(100vh - 200px);
+            padding-bottom: 3rem;
         }
         
-        .navbar {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* Fixed Header Styling */
+        .header-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         
-        .offcanvas-body .nav-link {
+        .navbar-brand {
+            font-weight: 700;
             font-size: 1.1rem;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .offcanvas-body .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        
-        .offcanvas-body .nav-link.active {
-            background-color: rgba(13, 110, 253, 0.2);
-            border-left: 4px solid var(--info-color);
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
         }
         
         .nav-link {
-            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #64748b !important;
+            padding: 0.4rem 0.7rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
         
-        .nav-link:hover {
-            transform: translateY(-2px);
+        .nav-link:hover, .nav-link.active {
+            color: #6366f1 !important;
+            background: rgba(99, 102, 241, 0.08);
         }
         
-        .btn-info {
-            background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
-            border: none;
-        }
-        
-        .btn-info:hover {
-            background: linear-gradient(135deg, #0aa2c0 0%, #088199 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(13, 202, 240, 0.3);
-        }
-        
-        .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .footer {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            margin-top: auto;
-        }
-        
-        .footer a {
-            color: #0dcaf0;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .footer a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 66px;
-            }
-        }
-
-        /* Make cards a bit smaller and more compact on small (phone) screens */
-        @media (max-width: 576px) {
-            .card {
-                border-radius: 8px;
-            }
-
-            /* Reduce padding inside cards */
-            .card .card-body {
-                padding: 0.75rem;
-            }
-
-            /* Slightly smaller headings and text */
-            .card h1, .card h2, .card h3, .card h4, .card h5 {
-                font-size: 1rem;
-                margin-bottom: 0.4rem;
-            }
-
-            .card p, .card .lead, .card .small, .card .text-muted {
-                font-size: 0.85rem;
-            }
-
-            /* Reduce image heights so cards don't take too much vertical space */
-            .card-img-top, .paper-preview img, .cloudinary-image {
-                max-height: 140px;
-                width: 100%;
-                object-fit: cover;
-            }
-
-            /* Make large buttons slightly smaller */
-            .btn-lg {
-                padding: 0.45rem 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            /* Reduce spacing for lists/rows inside cards */
-            .card .row, .card .list-unstyled {
-                margin: 0;
-                gap: 0.25rem;
-            }
-        }
-        
-        /* Loading animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(13, 110, 253, 0.3);
+        /* Icons */
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
+            background: #f1f5f9;
+            color: #6366f1;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .header-icon-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border: 2px solid white;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Floating Cart Button */
+        .floating-cart {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 52px;
+            height: 52px;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+            z-index: 1050;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        /* Cloudinary specific styles */
-        .cloudinary-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
+        .floating-cart:hover {
+            transform: scale(1.1) translateY(-3px);
+            color: white;
         }
-        
-        .pdf-preview {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
+
+        /* Scrollable Navigation Row */
+        .nav-scroll-container {
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            display: flex;
+            padding: 0.25rem 0 0.5rem;
         }
-        
-        .pdf-preview:hover {
-            border-color: #0d6efd;
-            background: #e8f4fd;
+        .nav-scroll-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
-        
-        /* Print styles */
-        @media print {
-            .navbar, .footer, .no-print {
-                display: none !important;
-            }
-            body {
-                padding-top: 0;
-            }
+
+        .modern-card {
+            background: white;
+            border-radius: 1.25rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Responsive spacing */
+        @media (min-width: 992px) {
+            .navbar-brand { font-size: 1.4rem; }
+            .nav-link { font-size: 0.9rem; padding: 0.5rem 1rem !important; }
+            .header-icon-btn { width: 42px; height: 42px; }
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Cloudinary Configuration -->
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     
-    <!-- Drawer/Offcanvas Menu -->
-    <div class="offcanvas offcanvas-start bg-dark text-white" 
-         tabindex="-1" 
-         id="siteDrawer" 
-         aria-labelledby="siteDrawerLabel">
-
-        <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title fw-bold" id="siteDrawerLabel">
-                <span class="text-info">📚</span> InsiightPrep
-            </h5>
-            <button type="button" 
-                    class="btn-close btn-close-white" 
-                    data-bs-dismiss="offcanvas" 
-                    aria-label="Close"></button>
-        </div>
-
-        <div class="offcanvas-body">
-            <nav class="drawer-nav">
-                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                    
-                    <!-- Home -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:class_list' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}">
-                            <i class="fas fa-home me-2"></i> Home
-                        </a>
-                    </li>
-                    
-                    <!-- Browse Papers -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:all_papers' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'all_papers' %}active{% endif %}">
-                            <i class="fas fa-file-alt me-2"></i> Browse All Papers
-                        </a>
-                    </li>
-                    
-                    <!-- Search -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:search_papers' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'search_papers' %}active{% endif %}">
-                            <i class="fas fa-search me-2"></i> Search Papers
-                        </a>
-                    </li>
-                    
-                    <!-- Browse by Year -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:papers_by_year' year=current_year %}" 
-                           class="nav-link text-white">
-                            <i class="fas fa-calendar-alt me-2"></i> {{ current_year|default:"2024" }} Papers
-                        </a>
-                    </li>
-                    
-                    <!-- Contact -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:contact_us' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}">
-                            <i class="fas fa-envelope me-2"></i> Contact Us
-                        </a>
-                    </li>
-                    
-                    <!-- FAQ -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:faq' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'faq' %}active{% endif %}">
-                            <i class="fas fa-question-circle me-2"></i> FAQ
-                        </a>
-                    </li>
-                    
-                    <!-- About -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:about' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
-                            <i class="fas fa-info-circle me-2"></i> About Us
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item my-3">
-                        <hr class="text-white-50">
-                        <h6 class="text-info text-uppercase ms-3">Account</h6>
-                    </li>
-
-                    {% if user.is_authenticated %}
-                    <!-- Authenticated User -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:profile' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                            <i class="fas fa-user me-2"></i> My Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'shop:purchase_history' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'purchase_history' %}active{% endif %}">
-                            <i class="fas fa-history me-2"></i> Purchase History
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'shop:logout' %}" class="nav-link text-danger">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                    {% else %}
-                    <!-- Guest User -->
-                    <li class="nav-item">
-                        <a href="{% url 'shop:login' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'login' %}active{% endif %}">
-                            <i class="fas fa-sign-in-alt me-2"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'shop:register' %}" 
-                           class="nav-link text-white {% if request.resolver_match.url_name == 'register' %}active{% endif %}">
-                            <i class="fas fa-user-plus me-2"></i> Register
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- Admin Access -->
-                    {% if user.is_staff %}
-                    <li class="nav-item my-3">
-                        <hr class="text-white-50">
-                        <h6 class="text-warning text-uppercase ms-3">Admin</h6>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-warning" href="{% url 'admin:index' %}" target="_blank">
-                            <i class="fas fa-user-shield me-2"></i> Django Admin
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-        
-        <!-- Drawer Footer -->
-        <div class="offcanvas-footer p-3 border-top border-secondary">
-            <div class="text-center">
-                <small class="text-white-50">
-                    &copy; {% now "Y" %} InsiightPrep<br>
-                    <span class="text-info">Quality Educational Resources</span>
-                </small>
-            </div>
-        </div>
-    </div>
-
-    <!-- Top Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <!-- Unified Modern Header -->
+    <header class="header-wrapper">
         <div class="container">
-            
-            <!-- Drawer Toggle Button (Mobile) -->
-            <button class="btn btn-outline-info me-3 d-lg-none" 
-                    type="button" 
-                    data-bs-toggle="offcanvas" 
-                    data-bs-target="#siteDrawer" 
-                    aria-controls="siteDrawer">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <!-- Brand Logo -->
-            <a class="navbar-brand fw-bold" href="{% url 'shop:class_list' %}">
-                <span class="text-info">📚</span> InsiightPrep
-            </a>
-            
-            <!-- Search Form (Desktop) -->
-            <form class="d-none d-lg-flex ms-auto me-3" action="{% url 'shop:search_papers' %}" method="GET" style="max-width: 300px;">
-                <div class="input-group input-group-sm">
-                    <input type="text" 
-                           class="form-control" 
-                           placeholder="Search papers..." 
-                           name="q"
-                           value="{{ request.GET.q }}">
-                    <button class="btn btn-outline-info" type="submit">
+            <!-- Top Row: Brand & Profile/Cart -->
+            <div class="d-flex align-items-center justify-content-between py-2">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'shop:class_list' %}">
+                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                    InsiightPrep
+                </a>
+                
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Global Search Button (Mobile can use this) -->
+                    <a href="{% url 'shop:search_papers' %}" class="header-icon-btn d-lg-none">
                         <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <!-- Main Navigation -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <!-- Home -->
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" 
-                           href="{% url 'shop:class_list' %}">
-                            <i class="fas fa-home d-lg-none d-xl-inline me-1"></i>
-                            <span class="d-none d-lg-inline">Home</span>
-                        </a>
-                    </li>
-                    
-                    <!-- Browse Papers Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-file-alt d-lg-none d-xl-inline me-1"></i>
-                            <span class="d-none d-lg-inline">Browse Papers</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'shop:all_papers' %}">
-                                <i class="fas fa-file-alt me-2"></i> All Papers
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_year' year=current_year %}">
-                                <i class="fas fa-calendar-alt me-2"></i> {{ current_year|default:"2024" }} Papers
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">By Exam Type</h6></li>
-                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' exam_type='endterm' %}">
-                                <i class="fas fa-file-contract me-2"></i> End-Term Exams
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' exam_type='midterm' %}">
-                                <i class="fas fa-file-medical me-2"></i> Mid-Term Exams
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'shop:papers_by_type' exam_type='cat' %}">
-                                <i class="fas fa-file-check me-2"></i> CATs
-                            </a></li>
-                        </ul>
-                    </li>
-                    
-                    <!-- Contact -->
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}" 
-                           href="{% url 'shop:contact_us' %}">
-                            <i class="fas fa-envelope d-lg-none d-xl-inline me-1"></i>
-                            <span class="d-none d-lg-inline">Contact</span>
-                        </a>
-                    </li>
-                    
+                    </a>
+
+                    <!-- Cart Icon -->
+                    <a href="{% url 'shop:cart_detail' %}" class="header-icon-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% with total_items=cart|length %}
+                            {% if total_items > 0 %}
+                                <span class="badge rounded-pill bg-danger cart-badge">{{ total_items }}</span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+
                     <!-- User Dropdown -->
                     {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user d-lg-none d-xl-inline me-1"></i>
-                            <span class="d-none d-lg-inline">{{ user.username|truncatechars:15 }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'shop:profile' %}">
-                                <i class="fas fa-user me-2"></i> Profile
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'shop:purchase_history' %}">
-                                <i class="fas fa-history me-2"></i> Purchase History
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'shop:logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i> Logout
-                            </a></li>
-                        </ul>
-                    </li>
+                        <div class="dropdown">
+                            <button class="header-icon-btn p-0 overflow-hidden" type="button" data-bs-toggle="dropdown" style="border: 2px solid #6366f1;">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" class="w-100 h-100 object-fit-cover" alt="U">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff" class="w-100 h-100" alt="U">
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 animate__animated animate__fadeInUp">
+                                <li class="px-3 py-2 border-bottom">
+                                    <span class="d-block fw-bold text-dark text-truncate" style="max-width: 150px;">{{ user.username }}</span>
+                                    <small class="text-muted small">{{ user.email|truncatechars:20 }}</small>
+                                </li>
+                                <li><a class="dropdown-item py-2" href="{% url 'shop:profile' %}"><i class="fas fa-id-card me-2 text-primary"></i> Profile</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'shop:purchase_history' %}"><i class="fas fa-history me-2 text-primary"></i> History</a></li>
+                                {% if user.is_staff %}
+                                    <li><a class="dropdown-item py-2" href="{% url 'admin:index' %}"><i class="fas fa-user-shield me-2 text-warning"></i> Admin</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="{% url 'shop:logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
                     {% else %}
-                    <!-- Login/Register -->
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-info text-dark fw-bold ms-lg-2" href="{% url 'shop:login' %}">
-                            <i class="fas fa-sign-in-alt me-1"></i> 
-                            <span class="d-none d-lg-inline">Login / Register</span>
-                            <span class="d-lg-none">Login</span>
+                        <a href="{% url 'shop:login' %}" class="header-icon-btn">
+                            <i class="fas fa-user"></i>
                         </a>
-                    </li>
                     {% endif %}
-                    
-                    <!-- Search Button (Mobile) -->
-                    <li class="nav-item d-lg-none mt-2">
-                        <form class="d-flex" action="{% url 'shop:search_papers' %}" method="GET">
-                            <div class="input-group">
-                                <input type="text" 
-                                       class="form-control" 
-                                       placeholder="Search papers..." 
-                                       name="q"
-                                       value="{{ request.GET.q }}">
-                                <button class="btn btn-outline-info" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </li>
-                </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Persistent Nav Links (Always visible, scrollable if narrow) -->
+            <div class="nav-scroll-container">
+                <nav class="nav">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" href="{% url 'shop:class_list' %}">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'all_papers' %}active{% endif %}" href="{% url 'shop:all_papers' %}">
+                        <i class="fas fa-file-alt me-1"></i> Browse Papers
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}" href="{% url 'shop:contact_us' %}">
+                        <i class="fas fa-envelope me-1"></i> Contact
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'shop:faq' %}">
+                        <i class="fas fa-question-circle me-1"></i> FAQ
+                    </a>
+                </nav>
             </div>
         </div>
-    </nav>
-    
-    <!-- Breadcrumbs -->
-    {% if breadcrumbs %}
-        <nav aria-label="breadcrumb" class="container mt-3">
-            <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
-                {% for crumb in breadcrumbs %}
-                    {% if forloop.last %}
-                        <li class="breadcrumb-item active">{{ crumb.name }}</li>
-                    {% else %}
-                        <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.name }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ol>
-        </nav>
-    {% endif %}
+    </header>
 
-    <!-- Messages/Alerts -->
+    <!-- Floating Cart Button (Persistent) -->
+    {% with total_items=cart|length %}
+        <a href="{% url 'shop:cart_detail' %}" class="floating-cart animate__animated {% if total_items > 0 %}animate__bounceInRight{% else %}d-none{% endif %}" id="floatingCart">
+            <i class="fas fa-shopping-cart"></i>
+            {% if total_items > 0 %}
+                <span class="badge rounded-pill bg-danger animate__animated animate__pulse animate__infinite">
+                    {{ total_items }}
+                </span>
+            {% endif %}
+        </a>
+    {% endwith %}
+
+    <!-- Messages / Alerts -->
     {% if messages %}
-        <div class="container mt-3">
+        <div class="container mt-3 animate__animated animate__fadeInDown">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
-                    {% if message.tags == 'success' %}
-                        <i class="fas fa-check-circle me-2"></i>
-                    {% elif message.tags == 'warning' %}
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                    {% elif message.tags == 'error' or message.tags == 'danger' %}
-                        <i class="fas fa-times-circle me-2"></i>
-                    {% else %}
-                        <i class="fas fa-info-circle me-2"></i>
-                    {% endif %}
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle me-2 text-danger"></i>
+                        {% endif %}
+                        <div class="small">{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" style="padding: 0.75rem;"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
     <!-- Main Content -->
-    <main class="container main-content">
-        {% block content %}
-        {% endblock %}
+    <main class="main-content">
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-4 border-top border-info border-opacity-50">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="text-info mb-3">
-                        <span class="text-info">📚</span> InsiightPrep
-                    </h5>
-                    <p class="small text-white-50">
-                        Your trusted source for quality educational resources, 
-                        examination papers, and learning materials.
-                    </p>
-                    <div class="social-links mt-3">
-                        <a href="#" class="text-info me-3" title="Facebook">
-                            <i class="fab fa-facebook fa-lg"></i>
-                        </a>
-                        <a href="#" class="text-info me-3" title="Twitter">
-                            <i class="fab fa-twitter fa-lg"></i>
-                        </a>
-                        <a href="#" class="text-info me-3" title="Instagram">
-                            <i class="fab fa-instagram fa-lg"></i>
-                        </a>
-                        <a href="#" class="text-info" title="WhatsApp">
-                            <i class="fab fa-whatsapp fa-lg"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <h6 class="text-white mb-3">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'shop:class_list' %}">Home</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:all_papers' %}">Browse Papers</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:search_papers' %}">Search</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:contact_us' %}">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
-                    <h6 class="text-white mb-3">Account</h6>
-                    <ul class="list-unstyled">
-                        {% if user.is_authenticated %}
-                        <li class="mb-2"><a href="{% url 'shop:profile' %}">My Profile</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:purchase_history' %}">Purchase History</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:logout' %}">Logout</a></li>
-                        {% else %}
-                        <li class="mb-2"><a href="{% url 'shop:login' %}">Login</a></li>
-                        <li class="mb-2"><a href="{% url 'shop:register' %}">Register</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4">
-                    <h6 class="text-white mb-3">Contact Info</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-envelope me-2 text-info"></i>
-                            <a href="mailto:darkosammy2@gmail.com">darkosammy2@gmail.com</a>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-phone me-2 text-info"></i>
-                            <a href="tel:+233542232515">+233 542 232 515</a>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-map-marker-alt me-2 text-info"></i>
-                            Accra, Ghana
-                        </li>
-                    </ul>
-                </div>
+    <!-- Simple Modern Footer -->
+    <footer class="bg-white border-top py-5">
+        <div class="container text-center">
+            <div class="navbar-brand mb-3 d-inline-block">InsiightPrep</div>
+            <p class="text-slate-500 small mb-4">Empowering students with quality educational resources.</p>
+            
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="https://wa.me/233542232515" class="header-icon-btn"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://x.com/DarkoSamuel15" class="header-icon-btn"><i class="fab fa-x-twitter"></i></a>
             </div>
             
-            <hr class="border-info my-4">
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="small mb-0">
-                        &copy; {% now "Y" %} InsiightPrep. All rights reserved.
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="small mb-0">
-                        <a href="{% url 'shop:privacy_policy' %}" class="me-3">Privacy Policy</a>
-                        <a href="{% url 'shop:terms_of_service' %}" class="me-3">Terms of Service</a>
-                        <a href="{% url 'shop:faq' %}">FAQ</a>
-                    </p>
-                </div>
+            <div class="d-flex flex-wrap justify-content-center gap-3 small mb-4">
+                <a href="{% url 'shop:all_papers' %}" class="text-decoration-none text-slate-600">All Papers</a>
+                <a href="{% url 'shop:faq' %}" class="text-decoration-none text-slate-600">FAQ</a>
+                <a href="{% url 'shop:privacy_policy' %}" class="text-decoration-none text-slate-600">Privacy</a>
+                <a href="{% url 'shop:terms_of_service' %}" class="text-decoration-none text-slate-600">Terms</a>
             </div>
+            
+            <p class="mb-0 x-small text-slate-400">&copy; {% now "Y" %} InsiightPrep. All Rights Reserved.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
-    
-    <!-- Cloudinary JS -->
-    <script src="https://unpkg.com/cloudinary-video-player/dist/cld-video-player.min.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script>
-        // Add active class to current nav links
-        document.addEventListener('DOMContentLoaded', function() {
-            // Highlight current page in drawer
-            const currentPath = window.location.pathname;
-            const drawerLinks = document.querySelectorAll('.offcanvas-body .nav-link');
-            
-            drawerLinks.forEach(link => {
-                const linkPath = new URL(link.href, window.location.origin).pathname;
-                if (linkPath === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-            
-            // Highlight current page in navbar
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)');
-            navLinks.forEach(link => {
-                const linkPath = new URL(link.href, window.location.origin).pathname;
-                if (linkPath === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-            
-            // Auto-dismiss alerts after 5 seconds
-            setTimeout(function() {
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(alert => {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                });
-            }, 5000);
-            
-            // Add loading state to buttons with .btn-loading class
-            document.querySelectorAll('.btn-loading').forEach(button => {
-                button.addEventListener('click', function() {
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<span class="loading me-2"></span> Processing...';
-                    this.disabled = true;
-                    
-                    // Restore button after 3 seconds
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                    }, 3000);
-                });
-            });
-            
-            // Cloudinary PDF preview handling
-            document.querySelectorAll('.cloudinary-pdf').forEach(element => {
-                element.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pdfUrl = this.href;
-                    
-                    // Open PDF in new tab or show preview
-                    window.open(pdfUrl, '_blank');
-                    
-                    // Track PDF view
-                    const paperSlug = this.getAttribute('data-paper-slug');
-                    if (paperSlug) {
-                        trackPaperView(paperSlug);
-                    }
-                });
-            });
-        });
-        
-        // Simple form validation helper
-        function validateForm(formId) {
-            const form = document.getElementById(formId);
-            const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    input.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    input.classList.remove('is-invalid');
-                }
-            });
-            
-            return isValid;
-        }
-        
-        // AJAX helper function
-        async function makeAjaxRequest(url, method = 'GET', data = null) {
-            try {
-                const options = {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                };
-                
-                if (data && method !== 'GET') {
-                    options.body = JSON.stringify(data);
-                }
-                
-                const response = await fetch(url, options);
-                return await response.json();
-            } catch (error) {
-                console.error('AJAX request failed:', error);
-                return { success: false, error: 'Network error' };
-            }
-        }
-        
-        // Helper to get CSRF token
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        // Track paper views (for paper detail pages)
-        function trackPaperView(paperSlug) {
-            if (paperSlug) {
-                fetch(`/api/track-view/${paperSlug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json'
-                    }
-                });
-            }
-        }
-        
-        // Track downloads (for free papers)
-        function trackDownload(paperSlug, email = null) {
-            if (paperSlug) {
-                const data = {};
-                if (email) {
-                    data.email = email;
-                }
-                
-                fetch(`/api/track-download/${paperSlug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-            }
-        }
-        
-        // Back to top button functionality
-        const backToTopButton = document.createElement('button');
-        backToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
-        backToTopButton.className = 'btn btn-info btn-floating';
-        backToTopButton.style.position = 'fixed';
-        backToTopButton.style.bottom = '20px';
-        backToTopButton.style.right = '20px';
-        backToTopButton.style.display = 'none';
-        backToTopButton.style.zIndex = '1000';
-        backToTopButton.style.width = '50px';
-        backToTopButton.style.height = '50px';
-        backToTopButton.style.borderRadius = '50%';
-        backToTopButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-        
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopButton.style.display = 'block';
-            } else {
-                backToTopButton.style.display = 'none';
-            }
-        });
-        
-        document.body.appendChild(backToTopButton);
-        
-        // Cloudinary image optimization
-        function optimizeCloudinaryImages() {
-            document.querySelectorAll('img[data-cloudinary-src]').forEach(img => {
-                const src = img.getAttribute('data-cloudinary-src');
-                const width = img.offsetWidth || 800;
-                const height = img.offsetHeight || 600;
-                
-                // Generate optimized Cloudinary URL
-                const optimizedUrl = src.replace('/upload/', `/upload/w_${width},h_${height},c_fill,q_auto,f_auto/`);
-                img.src = optimizedUrl;
-            });
-        }
-        
-        // Run image optimization on load and resize
-        window.addEventListener('load', optimizeCloudinaryImages);
-        window.addEventListener('resize', optimizeCloudinaryImages);
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

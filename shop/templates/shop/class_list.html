@@ -1,280 +1,264 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_title %}Select Your Class/Grade{% endblock %}
+{% block page_title %}Select Your Class/Grade | InsiightPrep{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <div class="mb-4">
-            <i class="bi bi-mortarboard-fill text-primary" style="font-size: 4rem;"></i>
-        </div>
-        <h1 class="display-5 text-primary fw-bold mb-3">
-            Available Academic Levels
-        </h1>
-        <p class="lead text-muted mx-auto" style="max-width: 600px;">
-            Choose your class to access thousands of secure question papers.
-        </p>
-        
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-8">
-                <div class="d-flex flex-wrap justify-content-center gap-4">
-                    <div class="stat-item">
-                        <h3 class="text-info mb-0">{{ total_papers|default:"100+" }}</h3>
-                        <small class="text-muted">Question Papers</small>
+<!-- Hero Section -->
+<div class="bg-white border-bottom mb-5">
+    <div class="container py-lg-5 py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 animate__animated animate__fadeInLeft">
+                <span class="badge bg-emerald-soft text-emerald px-3 py-2 rounded-pill mb-3 fw-semibold">
+                    <i class="fas fa-sparkles me-1"></i> New Papers Added Weekly
+                </span>
+                <h1 class="display-4 fw-bold mb-4">
+                    Master Your Exams with <span class="text-emerald-gradient">Premium Papers</span>
+                </h1>
+                <p class="lead text-slate-500 mb-5">
+                    Access thousands of curated examination papers across all grades. Download, practice, and excel in your academic journey.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'shop:all_papers' %}" class="btn btn-emerald-gradient px-4 py-3">
+                        Browse All Papers <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#browse-levels" class="btn btn-light px-4 py-3 border">
+                        View Grades
+                    </a>
+                </div>
+                
+                <div class="row mt-5 g-4">
+                    <div class="col-4 text-center text-sm-start">
+                        <div class="fw-bold h4 mb-0 text-emerald">{{ total_papers|default:"100+" }}</div>
+                        <div class="small text-slate-400">Papers</div>
                     </div>
-                    <div class="stat-item">
-                        <h3 class="text-success mb-0">{{ total_downloads|default:"5000+" }}</h3>
-                        <small class="text-muted">Total Downloads</small>
+                    <div class="col-4 border-start text-center text-sm-start">
+                        <div class="fw-bold h4 mb-0 text-emerald">{{ total_downloads|default:"5k+" }}</div>
+                        <div class="small text-slate-400">Downloads</div>
                     </div>
-                    <div class="stat-item">
-                        <h3 class="text-warning mb-0">{{ classes|length }}</h3>
-                        <small class="text-muted">Academic Levels</small>
+                    <div class="col-4 border-start text-center text-sm-start">
+                        <div class="fw-bold h4 mb-0 text-emerald">{{ classes|length }}</div>
+                        <div class="small text-slate-400">Grades</div>
                     </div>
+                </div>
+            </div>
+            <div class="col-lg-6 animate__animated animate__fadeInRight">
+                <div class="position-relative">
+                    <div class="bg-emerald-gradient rounded-circle position-absolute blur-3xl opacity-10" style="width: 100%; height: 100%; top: 0; right: 0;"></div>
+                    <img src="https://img.freepik.com/free-photo/back-school-concept-with-copy-space_23-2148587570.jpg?t=st=1740412800~exp=1740416400~hmac=7b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b" 
+                         class="img-fluid rounded-4 shadow-2xl position-relative w-100" 
+                         alt="Education hero"
+                         style="max-height: 450px; object-fit: cover;"
+                         onerror="this.src='https://images.unsplash.com/photo-1523050335392-9ae824979603?q=80&w=1000&auto=format&fit=crop'">
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+</div>
+
+<div class="container" id="browse-levels">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-1">Academic Levels</h2>
+        <p class="text-slate-500 mb-4">Select your grade to see available terms and papers.</p>
+        
+        <!-- Quick Navigation Menu with Arrows -->
+        <div class="quick-nav-container fade-in-up">
+            <button class="nav-arrow left d-md-none" id="scrollLeft">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="quick-nav-wrapper">
+                <div class="quick-nav-scroll" id="navScroll">
+                    <a href="{% url 'shop:class_list' %}" class="quick-nav-pill active-emerald">
+                        <i class="fas fa-home me-2"></i> Home
+                    </a>
+                    <a href="{% url 'shop:all_papers' %}" class="quick-nav-pill">
+                        <i class="fas fa-file-lines me-2"></i> All Papers
+                    </a>
+                    <a href="{% url 'shop:papers_by_type' exam_type='endterm' %}" class="quick-nav-pill">
+                        <i class="fas fa-file-contract me-2"></i> End-Term
+                    </a>
+                    <a href="{% url 'shop:papers_by_type' exam_type='midterm' %}" class="quick-nav-pill">
+                        <i class="fas fa-file-medical me-2"></i> Mid-Term
+                    </a>
+                    <a href="{% url 'shop:papers_by_type' exam_type='mock' %}" class="quick-nav-pill">
+                        <i class="fas fa-graduation-cap me-2"></i> Mocks
+                    </a>
+                    <a href="{% url 'shop:faq' %}" class="quick-nav-pill">
+                        <i class="fas fa-circle-question me-2"></i> FAQ
+                    </a>
+                    <a href="{% url 'shop:contact_us' %}" class="quick-nav-pill">
+                        <i class="fas fa-headset me-2"></i> Support
+                    </a>
+                </div>
+            </div>
+
+            <button class="nav-arrow right d-md-none" id="scrollRight">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
         {% for class_obj in classes %}
-            <div class="col">
-                <a href="{% url 'shop:term_list' class_obj.slug %}" class="text-decoration-none card-link">
-                    <div class="card class-card h-100 shadow border-0 hover-lift">
-                        {# CHANGED: Replaced bg-gradient-primary with bg-teal-gradient #}
-                        <div class="card-header bg-teal-gradient text-white position-relative">
-                            <div class="class-icon">
-                                <i class="bi bi-backpack" style="font-size: 2.5rem;"></i>
+            <div class="col animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+                <a href="{% url 'shop:term_list' class_obj.slug %}" class="text-decoration-none group">
+                    <div class="modern-card compact-card h-100 card-emerald">
+                        <div class="card-glow-emerald"></div>
+                        <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
+                            <div class="icon-box-emerald">
+                                <i class="fas fa-graduation-cap"></i>
                             </div>
-                            {# SIMPLIFIED: Removed text-primary as parent uses text-white #}
-                            <h4 class="card-title mb-0 fw-bold">{{ class_obj.name }}</h4>
-                        </div>
-                        <div class="card-body p-4">
-                            <p class="card-text text-muted mb-4">
-                                {{ class_obj.description|default:"Access Term 1, Term 2, and Term 3 question papers for this academic level." }}
-                            </p>
-                            
-                            <div class="class-stats mb-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">
-                                        <i class="bi bi-file-earmark-pdf"></i> Papers:
-                                    </span>
-                                    <span class="fw-bold text-primary">
-                                        {{ class_obj.get_paper_count }}
-                                    </span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted small">
-                                        <i class="bi bi-collection"></i> Subjects:
-                                    </span>
-                                    <span class="fw-bold text-info">
-                                        {{ class_obj.subjects_count|default:"Multiple" }}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            </div>
-                        <div class="card-footer bg-transparent border-top-0 text-center">
-                            <span class="btn btn-primary btn-sm px-4">
-                                <i class="bi bi-arrow-right-circle me-1"></i> Browse Papers
+                            <span class="paper-badge-emerald">
+                                {{ class_obj.get_paper_count }} papers
                             </span>
+                        </div>
+                        <h5 class="fw-bold text-slate-800 mb-2 group-hover:text-emerald transition-colors position-relative">
+                            {{ class_obj.name }}
+                        </h5>
+                        <p class="text-slate-500 x-small mb-3 flex-grow-1 position-relative">
+                            {{ class_obj.description|default:"Explore exam papers and assessments for this level."|truncatechars:70 }}
+                        </p>
+                        <div class="d-flex align-items-center text-emerald fw-semibold x-small position-relative">
+                            Explore <i class="fas fa-arrow-right-long ms-2"></i>
                         </div>
                     </div>
                 </a>
             </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-warning text-center py-5">
-                    <div class="py-4">
-                        <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
-                        <h4 class="alert-heading">No Academic Levels Found!</h4>
-                        <p>No classes have been added yet. Please log into the Admin panel to add academic levels.</p>
-                        {% if user.is_staff %}
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline-warning mt-2">
-                            <i class="bi bi-gear"></i> Go to Admin Panel
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
         {% endfor %}
     </div>
-    
-    <div class="row justify-content-center mt-5 mb-5">
-        <div class="col-lg-10">
-            <div class="card bg-light border-0 shadow-sm">
-                <div class="card-body p-4 p-md-5">
-                    <h3 class="text-center mb-4 text-primary">
-                        <i class="bi bi-stars me-2"></i> Why Choose Our Platform?
-                    </h3>
-                    <div class="row g-4">
-                        <div class="col-md-4 text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-hdd-fill text-info" style="font-size: 2.5rem;"></i>
-                            </div>
-                            <h5>Secure File Hosting</h5>
-                            <p class="text-muted small">All papers are securely hosted for fast, reliable downloads.</p>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-shield-check text-success" style="font-size: 2.5rem;"></i>
-                            </div>
-                            <h5>Password Protected</h5>
-                            <p class="text-muted small">Paid papers are password-protected and delivered via SMS after payment</p>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-lightning-charge text-warning" style="font-size: 2.5rem;"></i>
-                            </div>
-                            <h5>Instant Access</h5>
-                            <p class="text-muted small">Get immediate download access after successful payment verification</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="text-center mt-5">
-        <h2 class="mb-4 text-dark">Need Assistance?</h2>
-        <p class="lead text-muted mx-auto" style="max-width: 600px;">
-            Our support team is ready to help with purchases, technical issues, or feedback.
-        </p>
-        <a href="{% url 'shop:contact_us' %}" class="btn btn-primary btn-lg fw-bold text-white shadow-lg">
-            <i class="bi bi-envelope me-2"></i> Contact Support
-        </a>
-        <div class="mt-3">
-            <a href="https://wa.me/233542232515" target="_blank" class="text-success small me-3 text-decoration-none">
-                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
-            </a>
-            <a href="tel:+233542232515" class="text-dark small text-decoration-none">
-                <i class="bi bi-telephone"></i> Call Us
-            </a>
-        </div>
-    </div>
 </div>
+
+<style>
+    :root {
+        --emerald-primary: #10b981;
+        --emerald-dark: #059669;
+        --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .bg-emerald-soft { background: rgba(16, 185, 129, 0.1); }
+    .text-emerald { color: var(--emerald-dark); }
+    .text-emerald-gradient {
+        background: var(--emerald-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .btn-emerald-gradient {
+        background: var(--emerald-gradient);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
+    }
+    .btn-emerald-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.5);
+        color: white;
+    }
+
+    /* Card Specific Emerald Styling */
+    .card-emerald {
+        border-left: 4px solid var(--emerald-primary) !important;
+        background: #ffffff !important;
+    }
+    .card-emerald:hover {
+        border-color: var(--emerald-dark) !important;
+        background: #f0fdf4 !important; /* Emerald 50 */
+    }
+    .icon-box-emerald {
+        width: 42px;
+        height: 42px;
+        background: var(--emerald-gradient);
+        color: white;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+    .paper-badge-emerald {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--emerald-dark);
+        background: #d1fae5; /* Emerald 100 */
+        padding: 0.3rem 0.75rem;
+        border-radius: 2rem;
+        text-transform: uppercase;
+    }
+    .card-glow-emerald {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08), transparent 70%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .modern-card:hover .card-glow-emerald { opacity: 1; }
+    
+    .quick-nav-pill.active-emerald {
+        background: var(--emerald-gradient);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .x-small { font-size: 0.8rem; }
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+    .blur-3xl { filter: blur(64px); }
+    
+    .compact-card {
+        padding: 1.25rem !important;
+        border-radius: 1rem !important;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .quick-nav-container { position: relative; display: flex; align-items: center; margin-bottom: 2rem; padding: 0 10px; }
+    .quick-nav-wrapper { flex: 1; overflow: hidden; }
+    .quick-nav-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; padding: 0.5rem; scroll-behavior: smooth; }
+    
+    .nav-arrow {
+        width: 32px; height: 32px; border-radius: 50%; background: white; border: 1px solid #e2e8f0;
+        display: flex; align-items: center; justify-content: center; color: var(--emerald-dark);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; z-index: 10;
+    }
+    
+    .quick-nav-pill {
+        display: inline-flex; align-items: center; padding: 0.6rem 1.25rem; background: white;
+        border: 1px solid #e2e8f0; border-radius: 2rem; color: #64748b; text-decoration: none;
+        font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;
+    }
+    .quick-nav-pill:hover { background: #f0fdf4; border-color: var(--emerald-primary); color: var(--emerald-dark); transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+        .quick-nav-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+        .quick-nav-scroll::-webkit-scrollbar { display: none; }
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effects to class cards
-    const classCards = document.querySelectorAll('.class-card');
-    
-    classCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px)';
-            this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-            this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '';
-        });
-        
-        // Add click ripple effect
-        card.addEventListener('click', function(e) {
-            if (!this.closest('a').href) return;
-            
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(13, 110, 253, 0.3);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                width: ${size}px;
-                height: ${size}px;
-                top: ${y}px;
-                left: ${x}px;
-                pointer-events: none;
-            `;
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-    
-    // Add animation to stat items
-    const statItems = document.querySelectorAll('.stat-item');
-    statItems.forEach((item, index) => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            item.style.opacity = '1';
-            item.style.transform = 'translateY(0)';
-        }, 100 * index);
-    });
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        const scrollContainer = document.getElementById('navScroll');
+        const scrollLeftBtn = document.getElementById('scrollLeft');
+        const scrollRightBtn = document.getElementById('scrollRight');
 
-// CSS for ripple animation
-const style = document.createElement('style');
-style.textContent = `
-    /* ADDED: Teal Gradient Class */
-    .bg-teal-gradient {
-        background: #008080; /* Teal primary color */
-        background: linear-gradient(135deg, #008080 0%, #004d4d 100%); /* Teal gradient for depth */
-    }
-
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
+        if (scrollContainer && scrollLeftBtn && scrollRightBtn) {
+            scrollLeftBtn.onclick = () => { scrollContainer.scrollBy({ left: -150, behavior: 'smooth' }); };
+            scrollRightBtn.onclick = () => { scrollContainer.scrollBy({ left: 150, behavior: 'smooth' }); };
+            const toggleArrows = () => {
+                const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+                scrollLeftBtn.style.opacity = scrollLeft > 0 ? '1' : '0.3';
+                scrollRightBtn.style.opacity = scrollLeft + clientWidth < scrollWidth ? '1' : '0.3';
+            };
+            scrollContainer.addEventListener('scroll', toggleArrows);
+            window.addEventListener('resize', toggleArrows);
+            toggleArrows();
         }
-    }
-    
-    .hover-lift {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .class-card {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .class-card .class-icon {
-        position: absolute;
-        top: -20px;
-        right: 20px;
-        opacity: 0.2;
-        transform: rotate(15deg);
-    }
-    
-    .card-link {
-        display: block;
-    }
-    
-    .feature-icon {
-        width: 80px;
-        height: 80px;
-        background: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    /* UPDATED: Changed border color from blue to teal */
-    .class-stats {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #008080; /* Teal color */
-    }
-`;
-document.head.appendChild(style);
+    });
 </script>
 {% endblock %}

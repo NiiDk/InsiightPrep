@@ -1,488 +1,55 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
-{% block title %}Register - InsiightPrep{% endblock %}
+{% block page_title %}Register | InsiightPrep{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <!-- Registration Card -->
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-gradient-primary text-white py-4">
-                    <h2 class="mb-0 text-center">
-                        <i class="fas fa-user-plus me-2"></i>Create Account
-                    </h2>
-                    <p class="text-center mb-0 small opacity-75">
-                        Join thousands of students and educators using Insight Innovations
-                    </p>
+        <div class="col-lg-6 col-md-8 animate__animated animate__fadeInUp">
+            <div class="modern-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="icon-box-lg bg-emerald-soft text-emerald mx-auto mb-3">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2 class="fw-bold">Create Account</h2>
+                    <p class="text-slate-500">Join InsiightPrep to track orders and save your details.</p>
                 </div>
-                
-                <div class="card-body p-4 p-md-5">
-                    <!-- Registration Form -->
-                    <form method="post" id="registrationForm" novalidate>
-                        {% csrf_token %}
-                        
-                        {% if form.errors %}
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Please correct the errors below.
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Personal Information -->
-                        <div class="mb-4">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-user-circle me-2"></i>Personal Information
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                        First Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
-                                           id="{{ form.first_name.id_for_label }}" 
-                                           name="{{ form.first_name.html_name }}"
-                                           value="{{ form.first_name.value|default:'' }}"
-                                           required>
-                                    {% if form.first_name.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.first_name.errors.0 }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                        Last Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
-                                           id="{{ form.last_name.id_for_label }}" 
-                                           name="{{ form.last_name.html_name }}"
-                                           value="{{ form.last_name.value|default:'' }}"
-                                           required>
-                                    {% if form.last_name.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.last_name.errors.0 }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">
-                                    Email Address <span class="text-danger">*</span>
-                                </label>
-                                <input type="email" 
-                                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                                       id="{{ form.email.id_for_label }}" 
-                                       name="{{ form.email.html_name }}"
-                                       value="{{ form.email.value|default:'' }}"
-                                       required
-                                       placeholder="example@domain.com">
-                                {% if form.email.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.email.errors.0 }}
-                                </div>
+
+                <form method="post" action="." class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        {% for field in form %}
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-slate-700">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="text-slate-400 x-small">{{ field.help_text }}</small>
                                 {% endif %}
-                                <div class="form-text">We'll send important updates to this email.</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Account Information -->
-                        <div class="mb-4">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-key me-2"></i>Account Information
-                            </h5>
-                            
-                            <div class="mb-3">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    Username <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
-                                       id="{{ form.username.id_for_label }}" 
-                                       name="{{ form.username.html_name }}"
-                                       value="{{ form.username.value|default:'' }}"
-                                       required
-                                       placeholder="Choose a unique username">
-                                {% if form.username.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.username.errors.0 }}
-                                </div>
-                                {% endif %}
-                                <div class="form-text">4-30 characters, letters and numbers only.</div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                        Password <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="input-group">
-                                        <input type="password" 
-                                               class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.password1.id_for_label }}" 
-                                               name="{{ form.password1.html_name }}"
-                                               required
-                                               placeholder="Create a strong password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password1')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        {% if form.password1.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ form.password1.errors.0 }}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                        Confirm Password <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="input-group">
-                                        <input type="password" 
-                                               class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
-                                               id="{{ form.password2.id_for_label }}" 
-                                               name="{{ form.password2.html_name }}"
-                                               required
-                                               placeholder="Repeat your password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password2')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        {% if form.password2.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ form.password2.errors.0 }}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Password Strength Meter -->
-                            <div class="mb-3">
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <small class="text-muted" id="passwordStrengthText">Password strength</small>
-                            </div>
-                        </div>
-                        
-                        <!-- Contact Information -->
-                        <div class="mb-4">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-phone me-2"></i>Contact Information
-                            </h5>
-                            
-                            <div class="mb-3">
-                                <label for="phone_number" class="form-label">
-                                    Phone Number <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">+233</span>
-                                    <input type="tel" 
-                                           class="form-control" 
-                                           id="phone_number" 
-                                           name="phone_number"
-                                           required
-                                           placeholder="54 223 2515"
-                                           pattern="[0-9]{9,10}">
-                                </div>
-                                <div class="form-text">We'll send purchase passwords via SMS to this number.</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Terms and Conditions -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input {% if form.terms.errors %}is-invalid{% endif %}" 
-                                       type="checkbox" 
-                                       id="terms" 
-                                       name="terms"
-                                       required>
-                                <label class="form-check-label" for="terms">
-                                    I agree to the <a href="{% url 'shop:terms_of_service' %}" target="_blank">Terms of Service</a> 
-                                    and <a href="{% url 'shop:privacy_policy' %}" target="_blank">Privacy Policy</a> <span class="text-danger">*</span>
-                                </label>
-                                {% if form.terms.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.terms.errors.0 }}
-                                </div>
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">{{ field.errors|first }}</div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="form-check mt-2">
-                                <input class="form-check-input" 
-                                       type="checkbox" 
-                                       id="newsletter" 
-                                       name="newsletter"
-                                       checked>
-                                <label class="form-check-label" for="newsletter">
-                                    I want to receive updates about new papers and promotions
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Submit Button -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-user-plus me-2"></i>Create Account
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" onclick="window.history.back()">
-                                <i class="fas fa-arrow-left me-2"></i>Cancel
-                            </button>
-                        </div>
-                    </form>
+                        {% endfor %}
+                    </div>
                     
-                    <!-- Login Link -->
-                    <div class="text-center mt-4 pt-3 border-top">
-                        <p class="mb-0">
-                            Already have an account? 
-                            <a href="{% url 'shop:login' %}" class="text-primary fw-bold">Login here</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Benefits Card -->
-            <div class="card border-0 shadow-sm mt-4">
-                <div class="card-body">
-                    <h5 class="text-primary mb-3">
-                        <i class="fas fa-star me-2"></i>Benefits of Registering
-                    </h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="d-flex">
-                                <i class="fas fa-history text-success me-3 fa-lg"></i>
-                                <div>
-                                    <h6 class="mb-1">Purchase History</h6>
-                                    <p class="small text-muted mb-0">Track all your purchases in one place</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="d-flex">
-                                <i class="fas fa-download text-info me-3 fa-lg"></i>
-                                <div>
-                                    <h6 class="mb-1">Easy Re-downloads</h6>
-                                    <p class="small text-muted mb-0">Access purchased papers anytime</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="d-flex">
-                                <i class="fas fa-bell text-warning me-3 fa-lg"></i>
-                                <div>
-                                    <h6 class="mb-1">Notifications</h6>
-                                    <p class="small text-muted mb-0">Get updates on new papers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="d-flex">
-                                <i class="fas fa-gift text-danger me-3 fa-lg"></i>
-                                <div>
-                                    <h6 class="mb-1">Special Offers</h6>
-                                    <p class="small text-muted mb-0">Exclusive discounts for members</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn btn-emerald-gradient w-100 py-3 fw-bold shadow-lg mt-4 mb-4">
+                        Register Now <i class="fas fa-check-circle ms-2"></i>
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    <p class="text-slate-500 small">Already have an account? <a href="{% url 'shop:login' %}" class="text-emerald fw-bold text-decoration-none">Login Here</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Password strength checker
-    const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
-    const strengthBar = document.getElementById('passwordStrength');
-    const strengthText = document.getElementById('passwordStrengthText');
-    
-    if (passwordInput) {
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            let strength = 0;
-            let text = 'Very weak';
-            let color = '#dc3545';
-            
-            // Check password strength
-            if (password.length >= 8) strength++;
-            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            if (/\d/.test(password)) strength++;
-            if (/[^A-Za-z0-9]/.test(password)) strength++;
-            
-            // Update UI
-            switch(strength) {
-                case 1:
-                    text = 'Weak';
-                    color = '#dc3545';
-                    break;
-                case 2:
-                    text = 'Fair';
-                    color = '#fd7e14';
-                    break;
-                case 3:
-                    text = 'Good';
-                    color = '#ffc107';
-                    break;
-                case 4:
-                    text = 'Strong';
-                    color = '#198754';
-                    break;
-            }
-            
-            strengthBar.style.width = (strength * 25) + '%';
-            strengthBar.style.backgroundColor = color;
-            strengthBar.className = 'progress-bar';
-            
-            if (strength >= 3) {
-                strengthBar.classList.add('bg-success');
-            } else if (strength >= 2) {
-                strengthBar.classList.add('bg-warning');
-            } else {
-                strengthBar.classList.add('bg-danger');
-            }
-            
-            strengthText.textContent = text;
-            strengthText.style.color = color;
-        });
-    }
-    
-    // Phone number formatting
-    const phoneInput = document.getElementById('phone_number');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function() {
-            let value = this.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                value = value.match(/.{1,3}/g).join(' ');
-            }
-            this.value = value;
-        });
-    }
-    
-    // Form validation
-    const form = document.getElementById('registrationForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            
-            // Check password match
-            const password1 = document.getElementById('{{ form.password1.id_for_label }}');
-            const password2 = document.getElementById('{{ form.password2.id_for_label }}');
-            
-            if (password1 && password2 && password1.value !== password2.value) {
-                password2.classList.add('is-invalid');
-                password2.nextElementSibling.innerHTML = 'Passwords do not match';
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-                // Scroll to first error
-                const firstError = form.querySelector('.is-invalid');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        });
-    }
-});
-
-// Toggle password visibility
-function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const button = field.nextElementSibling.querySelector('i');
-    
-    if (field.type === 'password') {
-        field.type = 'text';
-        button.className = 'fas fa-eye-slash';
-    } else {
-        field.type = 'password';
-        button.className = 'fas fa-eye';
-    }
-}
-
-// Auto-capitalize first letter of names
-document.getElementById('{{ form.first_name.id_for_label }}').addEventListener('blur', function() {
-    this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1).toLowerCase();
-});
-
-document.getElementById('{{ form.last_name.id_for_label }}').addEventListener('blur', function() {
-    this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1).toLowerCase();
-});
-</script>
-
 <style>
-.form-label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.form-control:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border-right: none;
-}
-
-.input-group .form-control {
-    border-left: none;
-}
-
-.input-group .btn-outline-secondary {
-    border-color: #ced4da;
-}
-
-.input-group .btn-outline-secondary:hover {
-    background-color: #f8f9fa;
-}
-
-.progress {
-    background-color: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    border-radius: 10px;
-    transition: width 0.3s ease;
-}
-
-.form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-lg {
-    padding: 12px 24px;
-    font-weight: 500;
-}
-
-@media (max-width: 768px) {
-    .card-body {
-        padding: 2rem !important;
-    }
-}
+    .icon-box-lg { width: 64px; height: 64px; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .bg-emerald-soft { background: rgba(16, 185, 129, 0.1); }
+    .text-emerald { color: #059669; }
+    .btn-emerald-gradient { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; }
 </style>
-{% endblock %}
 {% endblock %}

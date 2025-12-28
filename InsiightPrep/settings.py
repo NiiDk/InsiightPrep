@@ -27,6 +27,11 @@ for host in additional_hosts:
         ALLOWED_HOSTS.append(host)
 
 # ====================================================================
+# CART SESSION CONFIG
+# ====================================================================
+CART_SESSION_ID = 'cart'
+
+# ====================================================================
 # API KEYS
 # ====================================================================
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
@@ -90,6 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'shop.context_processors.current_year',
+                'shop.context_processors.cart',
             ],
         },
     },
