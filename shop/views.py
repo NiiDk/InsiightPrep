@@ -2,6 +2,8 @@
 
 import json
 import requests
+import logging
+import re
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
@@ -13,6 +15,86 @@ from django.core.mail import send_mail
 from django.db.models import Count
 from .models import Classes, Term, Subject, QuestionPaper, Payment, DownloadHistory
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
+# ====================================================================
+# UTILITY FUNCTIONS
+# ====================================================================
+
+def format_ghana_phone(phone):
+    """
+    Normalizes Ghana phone numbers to E.164 format (+233...)
+    Example: 0542232515 -> +233542232515
+    """
+    if not phone:
+        return phone
+    
+    # Remove all non-numeric characters
+    clean_phone = re.sub(r'\D', '', str(phone))
+    
+    # If it starts with 0, replace with +233
+    if clean_phone.startswith('0') and len(clean_phone) == 10:
+        return f"+233{clean_phone[1:]}"
+    
+    # If it's already 233... but no +, add +
+    if clean_phone.startswith('233') and len(clean_phone) == 12:
+        return f"+{clean_phone}"
+        
+    # Default fallback
+    if len(clean_phone) >= 9:
+        if not str(phone).startswith('+'):
+             return f"+{clean_phone}"
+    
+    return phone
+
+def send_sms_fulfillment(payment):
+    """Sends SMS password to the user using HTTPSMS."""
+    if not settings.HTTPSMS_API_KEY:
+        logger.error("HTTPSMS_API_KEY not found in settings")
+        return False
+
+    question_paper = payment.question_paper
+    message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!" 
+    
+    # Normalize the recipient phone number to E.164
+    to_phone = format_ghana_phone(payment.phone_number)
+    
+    # The 'from' number must be the phone number associated with your HTTPSMS Android app
+    # Update this to your verified HTTPSMS phone number
+    from_phone = "+233542232515" 
+    
+    httpsms_url = "https://api.httpsms.com/v1/messages/send"
+    httpsms_headers = {
+        "x-api-key": settings.HTTPSMS_API_KEY,
+        "Content-Type": "application/json"
+    }
+    
+    httpsms_payload = {
+        "content": message,
+        "to": to_phone,
+        "from": from_phone
+    }
+
+    logger.info(f"Attempting to send SMS to {to_phone} via HTTPSMS (from {from_phone})...")
+
+    try:
+        response = requests.post(httpsms_url, headers=httpsms_headers, json=httpsms_payload, timeout=15)
+        logger.info(f"HTTPSMS Response for {payment.ref}: {response.status_code} - {response.text}")
+        
+        # Check for success (200 OK or 201 Created)
+        if response.status_code in [200, 201]:
+            logger.info(f"SMS sent successfully to {to_phone}")
+            return True
+        else:
+            logger.error(f"HTTPSMS failed with status {response.status_code}: {response.text}")
+            return False
+    except requests.exceptions.Timeout:
+        logger.error(f"HTTPSMS request timed out for {payment.ref}")
+        return False
+    except Exception as e:
+        logger.error(f"Error sending SMS via HTTPSMS: {e}")
+        return False
 
 # ====================================================================
 # 1. HIERARCHICAL LIST VIEWS (Navigation)
@@ -345,6 +427,7 @@ def payment_callback(request):
     Shows success page with download options.
     """
     reference = request.GET.get('reference')
+    logger.info(f"Payment callback received for reference: {reference}")
     
     if not reference:
         return redirect('shop:class_list')
@@ -377,6 +460,12 @@ def payment_callback(request):
                     transaction_id=verification_data['data']['id'],
                     amount=float(verification_data['data']['amount']) / 100
                 )
+                logger.info(f"Payment {reference} verified on callback. Sending SMS...")
+                
+                # Fulfillment (SMS) on callback in case webhook is delayed
+                send_sms_fulfillment(payment)
+            else:
+                logger.warning(f"Payment verification failed on callback for {reference}: {verification_data}")
     
     # Create download URL with email parameter
     download_url = reverse('shop:download_file', args=[payment.question_paper.slug])
@@ -391,14 +480,14 @@ def payment_callback(request):
     return render(request, 'shop/callback_success.html', context)
 
 # ====================================================================
-# 6. PAYSTACK WEBHOOK HANDLER (UPDATED FOR HTTPSMS)
+# 6. PAYSTACK WEBHOOK HANDLER
 # ====================================================================
 
 @csrf_exempt
 def paystack_webhook(request):
     """
     Handles POST requests from Paystack, verifies the payment, marks it as verified, 
-    and triggers the SMS with the password using HTTPSMS.
+    and triggers the SMS with the password.
     """
     if request.method != 'POST':
         return HttpResponse(status=400)
@@ -408,12 +497,15 @@ def paystack_webhook(request):
     except json.JSONDecodeError:
         return HttpResponse(status=400)
 
+    logger.info(f"Paystack Webhook received: {payload.get('event')}")
+
     if payload.get('event') == 'charge.success':
         reference = payload['data']['reference']
         
         try:
             payment = Payment.objects.get(ref=reference)
         except Payment.DoesNotExist:
+            logger.error(f"Webhook error: Payment reference {reference} not found")
             return JsonResponse({'status': 'error', 'message': 'Payment reference not found'}, status=400)
 
         # Verify Payment with Paystack (Double Check)
@@ -436,29 +528,8 @@ def paystack_webhook(request):
                     payment.transaction_id = verification_data['data']['id']
                 payment.save()
 
-                question_paper = payment.question_paper
-                
-                # Compose the SMS message
-                message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!" 
-                
-                # HTTPSMS API Details
-                httpsms_url = "https://api.httpsms.com/v1/messages/send"
-                httpsms_headers = {
-                    "x-api-key": settings.HTTPSMS_API_KEY,
-                    "Content-Type": "application/json"
-                }
-                httpsms_payload = {
-                    "content": message,
-                    "to": payment.phone_number,
-                    "from": "+233542232515" # Replace with your verified HTTPSMS sender ID or number if required
-                }
-
-                try:
-                    # Send the SMS via HTTPSMS
-                    requests.post(httpsms_url, headers=httpsms_headers, json=httpsms_payload)
-                except Exception as e:
-                    # Log SMS error but don't fail the webhook
-                    print(f"Error sending SMS: {e}")
+                logger.info(f"Payment {reference} verified via webhook. Sending SMS...")
+                send_sms_fulfillment(payment)
                 
                 return JsonResponse({'status': 'success', 'message': 'Payment verified and password sent'}, status=200)
             
@@ -504,36 +575,16 @@ def track_download_api(request, paper_slug):
 @csrf_exempt
 def resend_password_api(request, payment_ref):
     """
-    API endpoint to resend password SMS using HTTPSMS.
+    API endpoint to resend password SMS.
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     try:
         payment = get_object_or_404(Payment, ref=payment_ref)
-        question_paper = payment.question_paper
-        
-        # Compose the SMS message
-        message = f"Your password for {question_paper.title} is: {question_paper.password}. Thank you for your purchase from Insight Innovations!"
-        
-        # HTTPSMS API Details
-        httpsms_url = "https://api.httpsms.com/v1/messages/send"
-        httpsms_headers = {
-            "x-api-key": settings.HTTPSMS_API_KEY,
-            "Content-Type": "application/json"
-        }
-        httpsms_payload = {
-            "content": message,
-            "to": payment.phone_number,
-            "from": "+233542232515" # Replace with your verified HTTPSMS sender ID or number
-        }
-        
-        response = requests.post(httpsms_url, headers=httpsms_headers, json=httpsms_payload)
-        
-        if response.status_code == 200 or response.status_code == 201:
+        if send_sms_fulfillment(payment):
             return JsonResponse({'success': True, 'message': 'Password resent'})
         else:
-            print(f"HTTPSMS Error: {response.text}")
             return JsonResponse({'error': 'Failed to send SMS'}, status=500)
             
     except Exception as e:
