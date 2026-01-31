@@ -1,6 +1,6 @@
-# InsiightPrep
+# FinalPreps
 
-InsiightPrep is a robust Django-based web application designed to provide students and educators with seamless access to high-quality examination question papers. The platform facilitates browsing papers by class level, term, and subject, and features integrated payment processing for premium content.
+FinalPreps is a robust Django-based web application designed to provide students and educators with seamless access to high-quality examination question papers. The platform facilitates browsing papers by class level, term, and subject, and features integrated payment processing for premium content.
 
 ## 🚀 Key Features
 
@@ -27,8 +27,8 @@ InsiightPrep is a robust Django-based web application designed to provide studen
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/InsiightPrep.git
-   cd InsiightPrep
+   git clone https://github.com/your-username/FinalPreps.git
+   cd FinalPreps
    ```
 
 2. **Set up a virtual environment**:
@@ -83,7 +83,7 @@ InsiightPrep is a robust Django-based web application designed to provide studen
 
 ## 📂 Project Structure
 
-- `InsiightPrep/`: Project configuration, core settings, and root URLs.
+- `FinalPreps/`: Project configuration, core settings, and root URLs.
 - `shop/`: Main application containing:
     - `models.py`: Database schema for Classes, Subjects, Papers, and Payments.
     - `views.py`: Logic for navigation, payment processing, and webhooks.

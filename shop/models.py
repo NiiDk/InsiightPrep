@@ -140,7 +140,7 @@ class QuestionPaper(models.Model):
             self.slug = candidate
 
         if not self.password and self.is_paid:
-            self.password = f"INSIGHT_{uuid.uuid4().hex[:8].upper()}"
+            self.password = f"FINALPREPS_{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):

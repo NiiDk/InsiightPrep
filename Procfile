@@ -1,2 +1,2 @@
 # Procfile content
-web: gunicorn InsiightPrep.wsgi
+web: gunicorn FinalPreps.wsgi:application --bind 0.0.0.0:8000

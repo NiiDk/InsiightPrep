@@ -1,4 +1,4 @@
-# InsightInnovations/settings.py
+# FinalPreps/settings.py
 from pathlib import Path
 from decouple import config
 import os  # Keep os imported
@@ -19,7 +19,7 @@ ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.s
 additional_hosts = [
     config('NGROK_TUNNEL', default='').replace('https://', '').replace('http://', '').split('/')[0],
     '.onrender.com',
-    'insiightprep.onrender.com',
+    'finalpreps.com',
     config('RENDER_EXTERNAL_HOSTNAME', default=''),
 ]
 for host in additional_hosts:
@@ -81,7 +81,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'InsiightPrep.urls'
+ROOT_URLCONF = 'FinalPreps.urls'
 
 TEMPLATES = [
     {
@@ -101,17 +101,39 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'InsiightPrep.wsgi.application'
+WSGI_APPLICATION = 'FinalPreps.wsgi.application'
 
 # ====================================================================
-# DATABASE (No change)
+# DATABASE (supports DATABASE_URL or individual DB_* env vars)
 # ====================================================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import dj_database_url
+
+# Prefer a full DATABASE_URL first (set by Coolify/Postgres add-on)
+DATABASE_URL = config('DATABASE_URL', default='')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)
     }
-}
+# Fallback to explicit env vars (DB_NAME/DB_USER/etc) if provided
+elif config('DB_NAME', default=''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='postgres'),
+            'USER': config('DB_USER', default=''),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
+# Otherwise keep local sqlite for development
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ====================================================================
 # PASSWORD VALIDATION (No change)

@@ -1,4 +1,4 @@
-# InsightInnovations/urls.py
+# FinalPreps/urls.py
 
 from django.contrib import admin
 from django.urls import path, include
@@ -7,6 +7,12 @@ from shop.views import paystack_webhook
 # 🔥 CRITICAL IMPORTS FOR MEDIA SERVING IN DEVELOPMENT
 from django.conf import settings
 from django.conf.urls.static import static 
+from django.http import HttpResponse
+
+
+def health(request):
+    return HttpResponse('OK')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,6 +22,7 @@ urlpatterns = [
     
     # Paystack webhook URL must be at the root.
     path('webhooks/paystack/', paystack_webhook, name='paystack-webhook'),
+    path('health/', health, name='health'),
 ]
 
 # -------------------------------------------------------------------

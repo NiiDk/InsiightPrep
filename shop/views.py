@@ -83,7 +83,7 @@ def send_sms_fulfillment(phone_number, order_items):
     results = []
     for item in order_items:
         payload = {
-            "content": f"Your password for {item.paper.title} is: {item.paper.password}. Thanks for using InsiightPrep!",
+            "content": f"Your password for {item.paper.title} is: {item.paper.password}. Thanks for using FinalPreps!",
             "to": to_phone, "from": from_phone
         }
         try:
